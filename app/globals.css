@@ -1,0 +1,368 @@
+:root {
+  --bg: #1b2027;
+  --surface: #232a33;
+  --line: #36414e;
+  --text: #e9e5dc;
+  --muted: #9aa5b1;
+  --siren: #ef4136;
+  --siren-ink: #1b0605;
+  --radius: 3px;
+  --display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 1rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+p,
+dl,
+dd,
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+ul {
+  list-style: none;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--siren);
+  outline-offset: 3px;
+}
+
+.page {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 28px 24px 140px;
+}
+
+.wordmark {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+}
+
+/* Hero */
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+  gap: 56px;
+  align-items: center;
+  min-height: 72vh;
+  padding: 56px 0 72px;
+}
+
+.claim-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(2.4rem, 6.4vw, 5.6rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.claim-prefix {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.claim-input {
+  min-width: 0;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-bottom: 3px solid var(--siren);
+  border-radius: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  letter-spacing: inherit;
+  caret-color: var(--siren);
+}
+
+.claim-input::placeholder {
+  color: #566170;
+}
+
+.claim-input:focus-visible {
+  outline: none;
+  border-bottom-color: var(--text);
+}
+
+.claim-status {
+  min-height: 1.5em;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.claim-status.ok {
+  color: var(--text);
+}
+
+.claim-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+  max-width: 460px;
+}
+
+.invite-input {
+  flex: 1 1 200px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.invite-input::placeholder {
+  color: #66717f;
+}
+
+.invite-input:focus-visible {
+  outline: none;
+  border-color: var(--siren);
+}
+
+.btn {
+  padding: 12px 20px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--siren);
+  color: var(--siren-ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.btn:disabled {
+  background: var(--line);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.lede {
+  max-width: 46ch;
+  margin-top: 36px;
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+/* Preview card */
+
+.stage {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+.card {
+  width: 100%;
+  max-width: 340px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+}
+
+.card-head {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.avatar {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius);
+  background: var(--siren);
+  color: var(--siren-ink);
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 1.5rem;
+}
+
+.card-name {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.card-bio {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.card-links {
+  margin-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.card-links li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-weight: 500;
+}
+
+.card-handle {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.card-views {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* Features */
+
+.features {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 56px;
+  padding: 72px 0;
+  border-top: 1px solid var(--line);
+}
+
+.features-title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.feature {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.feature:first-child {
+  padding-top: 0;
+}
+
+.feature dt {
+  font-weight: 600;
+}
+
+.feature dd {
+  max-width: 60ch;
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.footer {
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Dock */
+
+.dock {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(35, 42, 51, 0.92);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.dock a {
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.dock a:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Small screens */
+
+@media (max-width: 860px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+    min-height: 0;
+    padding: 40px 0 48px;
+  }
+
+  .features {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    padding: 48px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .card {
+    transition: none;
+  }
+}
