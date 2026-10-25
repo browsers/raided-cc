@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import GlyphPortal from "@/components/ui/glyph-portal";
-import { HERO_MEDIA } from "@/lib/hero-media";
+import HalftoneFlow from "@/components/ui/halftone-flow";
 
 const FAMILY = '"Glyph Portal Jakarta", Arial, sans-serif';
 let fontLoad: Promise<void> | undefined;
@@ -10,7 +10,6 @@ let fontLoad: Promise<void> | undefined;
 export default function GlyphPortalHome() {
   const [face, setFace] = useState<string | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const lockedRef = useRef(false);
 
   useEffect(() => {
@@ -40,19 +39,6 @@ export default function GlyphPortalHome() {
       clearTimeout(timeout);
     };
   }, []);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => {
-      if (reduced.matches) video.pause();
-      else void video.play().catch(() => {});
-    };
-    sync();
-    reduced.addEventListener("change", sync);
-    return () => reduced.removeEventListener("change", sync);
-  }, [face]);
 
   useEffect(() => {
     const block = (event: Event) => {
@@ -134,31 +120,11 @@ export default function GlyphPortalHome() {
                 position: "absolute",
                 inset: 0,
                 overflow: "hidden",
+                transform: "scale(var(--gp-field-scale, 1))",
+                transformOrigin: "center",
               }}
             >
-              <video
-                ref={videoRef}
-                src={HERO_MEDIA}
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="auto"
-                aria-hidden="true"
-                onEnded={(event) => {
-                  const video = event.currentTarget;
-                  video.currentTime = 0;
-                  void video.play().catch(() => {});
-                }}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  filter: "brightness(1.1) contrast(1.05)",
-                  transform: "scale(var(--gp-field-scale, 1))",
-                  transformOrigin: "center",
-                }}
-              />
+              <HalftoneFlow className="absolute inset-0 h-full w-full" />
             </div>
           }
         >
