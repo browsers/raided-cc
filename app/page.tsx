@@ -1,5 +1,5 @@
-import GlyphPortalHome from "@/components/GlyphPortalHome";
+import HalftoneLockup from "@/components/HalftoneLockup";
 
 export default function Home() {
-  return <GlyphPortalHome />;
+  return <HalftoneLockup />;
 }
