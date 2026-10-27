@@ -48,8 +48,8 @@ void main() {
 
   float intensity = sin(flow_uv.x * 2.0 + flow_uv.y * 3.0) * 0.5 + 0.5;
 
-  vec3 col_dark = vec3(0.46);
-  vec3 col_mid = vec3(0.82);
+  vec3 col_dark = vec3(0.26);
+  vec3 col_mid = vec3(0.76);
   vec3 col_bright = vec3(1.0);
 
   vec3 fluid_color = mix(col_dark, col_mid, smoothstep(0.2, 0.6, intensity));
@@ -60,11 +60,11 @@ void main() {
   vec2 cell_uv = fract(grid_uv) - 0.5;
 
   float dist = length(cell_uv);
-  float radius = mix(0.24, 0.46, intensity);
-  float dot_mask = smoothstep(radius, radius - 0.1, dist);
+  float radius = mix(0.32, 0.50, intensity);
+  float dot_mask = smoothstep(radius, radius - 0.12, dist);
 
-  vec3 final_color = mix(fluid_color * 0.45, fluid_color, dot_mask);
-  final_color += fluid_color * 0.08;
+  vec3 final_color = mix(vec3(0.0), fluid_color, dot_mask);
+  final_color += fluid_color * 0.05;
 
   gl_FragColor = vec4(final_color, 1.0);
 }`;

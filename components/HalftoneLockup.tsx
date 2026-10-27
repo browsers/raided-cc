@@ -7,7 +7,7 @@ const GHOST_PATH =
 
 const GHOST_MASK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 270"><defs><mask id="m" maskUnits="userSpaceOnUse" x="0" y="0" width="320" height="270"><rect width="320" height="270" fill="black"/><path d="${GHOST_PATH}" fill="white"/><ellipse cx="128" cy="120" rx="14" ry="30" fill="black"/><ellipse cx="192" cy="120" rx="14" ry="30" fill="black"/></mask></defs><rect width="320" height="270" fill="white" mask="url(#m)"/></svg>`;
 
-const CC_MASK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 100"><text x="0" y="80" font-family="Arial, Helvetica, sans-serif" font-size="100" font-weight="700" fill="white">.cc</text></svg>`;
+const CC_MASK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 100" preserveAspectRatio="none"><text x="0" y="84.5" font-family="Arial, Helvetica, sans-serif" font-size="100" font-weight="700" fill="white">.cc</text></svg>`;
 
 const GHOST_MASK_URL = `url("data:image/svg+xml,${encodeURIComponent(GHOST_MASK_SVG)}")`;
 const CC_MASK_URL = `url("data:image/svg+xml,${encodeURIComponent(CC_MASK_SVG)}")`;
