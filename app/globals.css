@@ -1,26 +1,3 @@
-@import "tailwindcss";
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-ring: var(--ring);
-}
-
-:root {
-  color-scheme: dark;
-  --background: #000;
-  --foreground: #e9e5dc;
-  --muted-foreground: #9aa5b1;
-  --ring: #8f8d86;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
 html,
 body {
   margin: 0;
@@ -33,11 +10,4 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   overflow: hidden;
-  color: var(--foreground);
-}
-
-.page {
-  min-height: 100vh;
-  min-height: 100dvh;
-  background: #000;
 }

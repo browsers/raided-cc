@@ -1,3 +1,11 @@
 export default function Home() {
-  return <main className="h-svh w-full bg-black" />;
+  return (
+    <main
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "#000",
+      }}
+    />
+  );
 }

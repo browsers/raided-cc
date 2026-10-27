@@ -3,7 +3,6 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "raided.cc",
-  description: "raided.cc",
 };
 
 export default function RootLayout({
@@ -12,7 +11,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body>{children}</body>
     </html>
   );
