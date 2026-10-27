@@ -1,5 +1,5 @@
-import HalftoneLockup from "@/components/HalftoneLockup";
+import ImageConverter from "@/components/ImageConverter";
 
 export default function Home() {
-  return <HalftoneLockup />;
+  return <ImageConverter />;
 }
