@@ -1,5 +1,3 @@
-import ImageConverter from "@/components/ImageConverter";
-
 export default function Home() {
-  return <ImageConverter />;
+  return <main className="h-svh w-full bg-black" />;
 }
