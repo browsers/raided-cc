@@ -60,7 +60,7 @@ export default function DashboardShell({
         {section === "overview" && null}
         {section === "settings" && null}
         {section === "badges" && null}
-        {section === "assets" && <AssetsPanel onAvatar={setImage} />}
+        {section === "assets" && <AssetsPanel image={image} onAvatar={setImage} />}
         {section === "description" && null}
       </main>
     </>

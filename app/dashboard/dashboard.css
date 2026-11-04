@@ -305,16 +305,30 @@
 }
 
 .assets__group {
+  padding: 16px;
+  /* Same look as the big .dash__panel it sits in */
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.025);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.assets__title {
+  margin: 4px 0 16px 4px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.assets__grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
-  padding: 16px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.02);
 }
 
 .assets__box {
+  position: relative;
+  overflow: hidden;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -369,8 +383,38 @@
   color: #ff6b6b;
 }
 
+/* Uploaded picture fills its box, with the text kept readable on top */
+.assets__preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.assets__box:has(.assets__preview)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent 35%, transparent 60%, rgba(0, 0, 0, 0.65));
+  pointer-events: none;
+}
+
+.assets__label,
+.assets__hint {
+  position: relative;
+  z-index: 1;
+}
+
+.assets__box:has(.assets__preview) .assets__hint {
+  margin-top: auto;
+  color: rgba(255, 255, 255, 0.85);
+}
+
 @media (max-width: 900px) {
-  .assets__group {
+  .assets__grid {
     grid-template-columns: 1fr;
   }
 }

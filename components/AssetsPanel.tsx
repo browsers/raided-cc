@@ -11,7 +11,13 @@ const BOXES: { id: BoxId; label: string; icon: string; accept: string }[] = [
   { id: "music", label: "Music", icon: "/icons/songs.png", accept: "audio/*" },
 ];
 
-export default function AssetsPanel({ onAvatar }: { onAvatar: (url: string) => void }) {
+export default function AssetsPanel({
+  image,
+  onAvatar,
+}: {
+  image: string | null;
+  onAvatar: (url: string) => void;
+}) {
   const [over, setOver] = useState<BoxId | null>(null);
   const [busy, setBusy] = useState<BoxId | null>(null);
   const [note, setNote] = useState<{ box: BoxId; text: string; error?: boolean } | null>(null);
@@ -49,6 +55,8 @@ export default function AssetsPanel({ onAvatar }: { onAvatar: (url: string) => v
   return (
     <div className="assets">
       <div className="assets__group">
+        <h2 className="assets__title">Profile</h2>
+        <div className="assets__grid">
         {BOXES.map((b) => (
           <div
             key={b.id}
@@ -76,9 +84,17 @@ export default function AssetsPanel({ onAvatar }: { onAvatar: (url: string) => v
               handle(b.id, e.dataTransfer.files?.[0]);
             }}
           >
+            {b.id === "pfp" && image ? (
+              // Current picture fills the box; it updates as soon as an upload finishes
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className="assets__preview" src={image} alt="" draggable={false} />
+            ) : null}
             <span className="assets__label">{b.label}</span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="assets__icon" src={b.icon} alt="" draggable={false} />
+            {!(b.id === "pfp" && image) && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className="assets__icon" src={b.icon} alt="" draggable={false} />
+            )}
             <span className="assets__hint" data-error={note?.box === b.id && note.error ? "true" : "false"}>
               {busy === b.id
                 ? "Uploading..."
@@ -100,6 +116,7 @@ export default function AssetsPanel({ onAvatar }: { onAvatar: (url: string) => v
             />
           </div>
         ))}
+        </div>
       </div>
     </div>
   );
