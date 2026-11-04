@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getDB } from "../../lib/db";
 import { countUniqueView } from "../../lib/views";
+import { backgroundFromKey } from "../../lib/r2";
+import ProfileBackdrop from "../../components/ProfileBackdrop";
 import "./profile.css";
 
 export const dynamic = "force-dynamic";
@@ -51,6 +53,19 @@ async function getUid(userId: string): Promise<number | null> {
   }
 }
 
+/** Background upload for this profile, or null (also null if the column is missing). */
+async function getBackground(userId: string) {
+  try {
+    const row = await getDB()
+      .prepare("SELECT background_key FROM profiles WHERE user_id = ?")
+      .bind(userId)
+      .first<{ background_key: string | null }>();
+    return backgroundFromKey(row?.background_key);
+  } catch {
+    return null;
+  }
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -73,10 +88,12 @@ export default async function ProfilePage({
 
   const views = await countUniqueView(user.id);
   const uid = await getUid(user.id);
+  const background = await getBackground(user.id);
   const name = user.displayUsername || user.username;
 
   return (
     <div className="profile">
+      {background && <ProfileBackdrop src={background.url} kind={background.kind} />}
       <div className="profile__stack">
         <main className="profile__card">
           {/* Default pfp for now; uploads come later */}

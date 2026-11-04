@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { authClient } from "../lib/auth-client";
 import AssetsPanel from "./AssetsPanel";
+import type { Background } from "../lib/r2";
 import DashboardNav, { type Section } from "./DashboardNav";
 
 export default function DashboardShell({
@@ -10,14 +11,17 @@ export default function DashboardShell({
   displayName,
   image: initialImage,
   uid,
+  background: initialBackground,
 }: {
   username: string;
   displayName: string;
   image: string | null;
   uid: number | null;
+  background: Background | null;
 }) {
   const [section, setSection] = useState<Section>("overview");
   const [image, setImage] = useState<string | null>(initialImage);
+  const [background, setBackground] = useState<Background | null>(initialBackground);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -169,7 +173,7 @@ export default function DashboardShell({
         {section === "overview" && null}
         {section === "settings" && null}
         {section === "badges" && null}
-        {section === "assets" && <AssetsPanel image={image} onAvatar={setImage} />}
+        {section === "assets" && <AssetsPanel image={image} onAvatar={setImage} background={background} onBackground={setBackground} />}
         {section === "description" && null}
       </main>
     </>

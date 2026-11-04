@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import DashboardShell from "../../components/DashboardShell";
 import { getAuth } from "../../lib/auth";
 import { getDB } from "../../lib/db";
+import { backgroundFromKey, type Background } from "../../lib/r2";
 
 export const dynamic = "force-dynamic";
 
@@ -29,12 +30,24 @@ export default async function DashboardPage() {
     } catch {}
   }
 
+  let background: Background | null = null;
+  if (session?.user?.id) {
+    try {
+      const row = await getDB()
+        .prepare("SELECT background_key FROM profiles WHERE user_id = ?")
+        .bind(session.user.id)
+        .first<{ background_key: string | null }>();
+      background = backgroundFromKey(row?.background_key);
+    } catch {}
+  }
+
   return (
     <DashboardShell
       username={username}
       displayName={displayName}
       image={user?.image ?? null}
       uid={uid}
+      background={background}
     />
   );
 }
