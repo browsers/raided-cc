@@ -96,7 +96,7 @@ export default function SignupForm({ initialUsername }: { initialUsername: strin
   }
 
   return (
-    <form className="auth__card" onSubmit={onSubmit} noValidate={false}>
+    <form className="auth__card" method="post" onSubmit={onSubmit} noValidate={false}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img className="auth__logo" src="/dock.png" alt="" width={36} height={36} draggable={false} />
       <h1 className="auth__title">Create your account</h1>

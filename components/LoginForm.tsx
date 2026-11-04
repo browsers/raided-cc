@@ -42,7 +42,7 @@ export default function LoginForm() {
   };
 
   return (
-    <form className="auth__card" onSubmit={onSubmit}>
+    <form className="auth__card" method="post" onSubmit={onSubmit}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img className="auth__logo" src="/dock.png" alt="" width={36} height={36} draggable={false} />
       <h1 className="auth__title">Welcome back</h1>
