@@ -102,6 +102,26 @@
   border: 2px solid rgba(255, 255, 255, 0.1);
   background: #0b0b0b;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+  /* Smooth in and out: fades and slides a few px; hidden state can't be clicked */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    visibility 0s linear 0.18s;
+}
+
+.dmenu[data-open="true"] {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    visibility 0s;
 }
 
 .dmenu__head {
@@ -137,9 +157,21 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.dmenu__item svg {
+.dmenu__icon {
   flex: none;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
   opacity: 0.6;
+  -webkit-user-drag: none;
+  user-select: none;
+  filter: brightness(0) invert(1);
+  transition: opacity 0.15s ease;
+}
+
+.dmenu__item:hover .dmenu__icon,
+.dmenu__item:focus-visible .dmenu__icon {
+  opacity: 1;
 }
 
 .dmenu__item:hover,

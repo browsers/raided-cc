@@ -74,8 +74,16 @@ export default function DashboardShell({
 
         {/* Account card, pinned to the bottom of the sidebar. Click it for the menu. */}
         <div className="dash__account" ref={accountRef}>
-          {menuOpen && (
-            <div className="dmenu" role="menu" aria-label="Account menu">
+          {/* Always mounted so it can fade out; data-open drives the transition */}
+          {(
+            <div
+              className="dmenu"
+              role="menu"
+              aria-label="Account menu"
+              data-open={menuOpen}
+              aria-hidden={!menuOpen}
+              inert={!menuOpen}
+            >
               <div className="dmenu__head">
                 <span className="dash__avatar dmenu__avatar">{avatar}</span>
                 <span className="dash__user-text">
@@ -88,10 +96,8 @@ export default function DashboardShell({
               </div>
               <div className="dmenu__sep" />
               <button type="button" className="dmenu__item" role="menuitem" onClick={shareProfile}>
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
-                  <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" />
-                </svg>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="dmenu__icon" src="/icons/share.png" alt="" width={20} height={20} draggable={false} />
                 {copied ? "Link copied!" : "Share your profile"}
               </button>
               <button
@@ -103,9 +109,8 @@ export default function DashboardShell({
                   setMenuOpen(false);
                 }}
               >
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" />
-                </svg>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="dmenu__icon" src="/icons/setting.png" alt="" width={20} height={20} draggable={false} />
                 Account settings
               </button>
               <a
@@ -116,9 +121,8 @@ export default function DashboardShell({
                 rel="noreferrer"
                 onClick={() => setMenuOpen(false)}
               >
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
-                </svg>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="dmenu__icon" src="/icons/page.png" alt="" width={20} height={20} draggable={false} />
                 View my page
               </a>
             </div>
