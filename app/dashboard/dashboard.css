@@ -1,0 +1,376 @@
+/* Dashboard shell. Covers the whole viewport so the global scroll-snap /
+   animated-background styles from the landing pages don't leak in. */
+.dash {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  box-sizing: border-box;
+  display: flex;
+  gap: 12px;
+  padding: 12px 12px 12px 0;
+  background: #000;
+  color: #fff;
+}
+
+/* Left side: pure black */
+.dash__side {
+  box-sizing: border-box;
+  flex: 0 0 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 18px 12px 0 16px;
+  background: #000;
+}
+
+.dash__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 32px 8px;
+}
+
+.dash__logo {
+  display: block;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.dash__brand-text {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* Big square panel, rounded like the dock (10px) */
+.dash__panel {
+  position: relative;
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: auto;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.025);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  scrollbar-width: none;
+}
+
+.dash__panel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Account card at the bottom of the sidebar */
+.dash__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding: 10px 10px 10px 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dash__avatar {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dash__avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.dash__avatar .dash__avatar-default {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.dash__user-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.dash__user-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.dash__user-handle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.dash__logout {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.dash__logout:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dash__logout img {
+  display: block;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+/* Sidebar nav */
+.dnav__label {
+  margin: 0 0 8px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.dnav__item {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* The grey highlight is the sliding .dnav__pill, not per-item backgrounds */
+.dnav {
+  position: relative;
+}
+
+.dnav__pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.08);
+  transition:
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    border-radius 0.25s ease,
+    opacity 0.18s ease;
+}
+
+/* First appearance: snap into place, only fade in */
+.dnav__pill[data-instant="true"] {
+  transition: opacity 0.18s ease;
+}
+
+.dnav__item,
+.dnav__sub-item {
+  position: relative;
+  z-index: 1;
+}
+
+.dnav__icon {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  -webkit-user-drag: none;
+  user-select: none;
+  filter: brightness(0) invert(1);
+}
+
+.dnav__label--section {
+  margin-top: 24px;
+}
+
+.dnav__text {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.dnav__chevron {
+  flex: none;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+
+.dnav__chevron[data-open="true"] {
+  transform: rotate(180deg);
+}
+
+/* Empty dropdown: animates open/closed, ready for items */
+.dnav__sub {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.2s ease;
+}
+
+.dnav__sub[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+
+.dnav__sub-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Items hang off a thin vertical line, lined up under the Account icon */
+.dnav__list {
+  margin: 6px 0 4px 24px;
+  padding: 0 0 0 12px;
+  list-style: none;
+  border-left: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.dnav__sub-item {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 2px 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 17px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.dnav__sub-item:hover {
+  color: #fff;
+}
+
+.dnav__sub-item[data-active="true"] {
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .dash {
+    padding: 8px;
+  }
+  .dash__side {
+    display: none;
+  }
+}
+/* Assets tab: one rectangle holding the three upload boxes */
+.assets {
+  padding: 24px;
+}
+
+.assets__group {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding: 16px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.assets__box {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 240px;
+  padding: 16px;
+  border-radius: 4px;
+  border: 2px dashed rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.assets__box:hover,
+.assets__box:focus-visible,
+.assets__box[data-over="true"] {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.assets__box[data-busy="true"] {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.assets__label {
+  align-self: flex-start;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.assets__icon {
+  margin: auto;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  opacity: 0.8;
+  -webkit-user-drag: none;
+  user-select: none;
+  filter: brightness(0) invert(1);
+}
+
+.assets__hint {
+  min-height: 18px;
+  font-size: 14px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.assets__hint[data-error="true"] {
+  color: #ff6b6b;
+}
+
+@media (max-width: 900px) {
+  .assets__group {
+    grid-template-columns: 1fr;
+  }
+}

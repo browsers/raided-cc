@@ -1,0 +1,8 @@
+DISCORD_BOT_TOKEN=
+DISCORD_USER_ID=
+# Cloudflare Turnstile (dash.cloudflare.com > Turnstile). Leave blank to use the test keys.
+TURNSTILE_SECRET_KEY=
+# Better Auth. Generate the secret with:
+#   node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+BETTER_AUTH_SECRET=
+BETTER_AUTH_URL=http://localhost:3000

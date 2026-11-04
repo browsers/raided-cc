@@ -1,0 +1,971 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  color: #fff;
+}
+
+html {
+  background: #000;
+}
+
+/* Transparent so the fixed animated background shows through */
+body {
+  background: transparent;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* Hide the native scrollbar (page still scrolls) */
+html {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* Snap to whole sections; "mandatory" settles on one after every scroll */
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  overscroll-behavior-y: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.snap {
+  height: 100vh;
+  height: 100dvh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always; /* a hard flick can't skip a section */
+}
+
+/* Window light: sits at the top of the page and scrolls away with the content.
+   The WebGL canvas plus a gradient that fades it into the page at the bottom
+   edge. */
+.windowlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.windowlight__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.windowlight__fade {
+  position: absolute;
+  inset: 0;
+}
+
+/* Contour tides: sits at the top of the page and scrolls away with the content.
+   The WebGL canvas plus a gradient that fades it into the page at the bottom
+   edge. */
+.tides {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.tides__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tides__fade {
+  position: absolute;
+  inset: 0;
+}
+
+/* Particle ocean background */
+.ocean {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Centered logo: icon + text */
+.hero {
+  box-sizing: border-box;
+  padding: 0 16px 14vh; /* nudges the logo up from dead center */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Icon + big text row (the size lives here so the claim box below stays fixed) */
+.hero__brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.12em;
+  font-size: clamp(44px, 10vw, 140px);
+}
+
+/* Claim box: raided.cc/<handle> with the button inside */
+.claim {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: min(400px, 100%);
+  padding: 5px 5px 5px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  font-size: 15px;
+  -webkit-user-select: auto;
+  user-select: auto;
+  cursor: text;
+  transition: border-color 0.15s ease;
+}
+
+.claim:focus-within {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.claim__prefix {
+  flex: none;
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: text;
+}
+
+.claim__input {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 8px 9px 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-family: inherit;
+}
+
+.claim__input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.claim__btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  min-height: 34px;
+  border: 0;
+  border-radius: 6px;
+  background: #f4f4f4;
+  color: #000;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease;
+}
+
+.claim__btn:hover {
+  background: #fff;
+}
+
+.claim__btn:active {
+  transform: scale(0.97);
+}
+
+.claim__btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+}
+
+.hero__icon {
+  display: block;
+  height: 1em;
+  width: auto;
+  max-width: 1.4em;
+  object-fit: contain;
+  cursor: default;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.hero__text {
+  margin: 0;
+  font-size: 1em;
+  font-weight: 700;
+  line-height: 1.15; /* room so the rise effect's clip doesn't cut ascenders */
+  letter-spacing: -0.04em;
+  color: #fff;
+  cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+  filter: drop-shadow(0 4px 24px rgba(0, 0, 0, 0.4));
+}
+
+/* Side dots. --t is 1 for the current section, 0 when a section away; JS
+   updates it as you scroll so the pill morphs continuously. */
+.dots {
+  position: fixed;
+  top: 50%;
+  right: 16px;
+  z-index: 40;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.dots__dot {
+  --t: 0;
+  display: block;
+  box-sizing: border-box;
+  width: 5px;
+  /* 5px dot -> 18px pill */
+  height: calc(5px + 13px * var(--t));
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  background: #fff;
+  /* grey when idle, white when active */
+  opacity: calc(0.45 + 0.55 * var(--t));
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Bigger invisible tap target around the thin dot */
+.dots__dot {
+  position: relative;
+}
+
+.dots__dot::before {
+  content: "";
+  position: absolute;
+  inset: -6px -10px;
+}
+
+.dots__dot:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 3px;
+}
+
+/* Glass dock (top bar) */
+.dock {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding: 0 16px;
+  pointer-events: none;
+}
+
+.dock__bar {
+  position: relative;
+  box-sizing: border-box;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  width: 980px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 6px 8px 6px 16px;
+  will-change: width;
+  transition: width 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  border-radius: 10px;
+  /* Flat glass: thin border, light tint, no gradient / inner highlight / big shadow */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1); /* fallback if blur is unsupported */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .dock__bar {
+    background: rgba(255, 255, 255, 0.05);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+}
+
+.dock a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.dock__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.dock__brand-icon {
+  flex: none;
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.dock__links {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.dock__link {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.65);
+  transition:
+    color 0.15s ease,
+    padding 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Icon sits on the left of the label and is always visible. When the dock
+   shrinks, the label (and its left margin) collapses and the icon stays. */
+.dock__icon {
+  flex: none;
+  display: block;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  transform-origin: center;
+  /* Black icons turn pure white to match the dock */
+  filter: brightness(0) invert(1);
+}
+
+/* The source PNGs have different amounts of internal padding. Normalize their
+   visual size so all three nav icons read at the same scale. */
+.dock__icon--trophy {
+  transform: scale(0.944);
+}
+
+.dock__icon--info {
+  transform: scale(0.944);
+}
+
+.dock__icon--components {
+  transform: scale(1.03);
+}
+
+.dock__text {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  width: var(--tw, auto);
+  margin-left: 8px;
+  opacity: 1;
+  transition:
+    width 0.5s cubic-bezier(0.32, 0.72, 0, 1),
+    margin-left 0.5s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.2s ease 0.1s;
+}
+
+.dock__text > span {
+  display: block;
+  width: max-content;
+}
+
+.dock__link:hover,
+.dock__link:focus-visible,
+.dock__link[aria-current="page"] {
+  color: #fff;
+}
+
+/* Collapsed: bar shrinks, link text gives way to icons */
+.dock[data-collapsed="true"] .dock__bar {
+  width: var(--dock-collapsed-w, 260px);
+}
+
+.dock[data-collapsed="true"] .dock__link {
+  padding-inline: 8px;
+}
+
+.dock[data-collapsed="true"] .dock__text {
+  width: 0;
+  margin-left: 0;
+  opacity: 0;
+  transition:
+    width 0.5s cubic-bezier(0.32, 0.72, 0, 1),
+    margin-left 0.5s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.15s ease;
+}
+
+/* One shared highlight that glides between links */
+.dock__hl {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.dock__hl--slide {
+  transition:
+    transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s ease;
+}
+
+.dock__discord {
+  position: relative;
+  overflow: hidden;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 15px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: #5865f2;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.dock__discord:hover {
+  background: #4752c4;
+}
+
+/* Shine sweep on hover */
+.dock__discord::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 55%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  transform: translateX(-140%) skewX(-20deg);
+  pointer-events: none;
+}
+
+.dock__discord:hover::after {
+  transform: translateX(300%) skewX(-20deg);
+  transition: transform 0.7s ease;
+}
+
+/* Account box, sits right of the Discord button. Same glass as the dock. */
+.dock__user {
+  flex: none;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.dock__user:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* The PNG has transparent padding, so draw it bigger than the old 20px icons
+   to make the glyph itself fill the box. Bump --user-icon-size if it still
+   looks small. */
+.dock__user-icon {
+  display: block;
+  width: var(--user-icon-size, 24px);
+  height: var(--user-icon-size, 24px);
+  object-fit: contain;
+  -webkit-user-drag: none;
+  user-select: none;
+  /* Force pure white regardless of the source colour */
+  filter: brightness(0) invert(1);
+}
+
+/* Account area: wrapper holds the box (signed out) or the pill + menu (signed in) */
+.dock__account {
+  position: relative;
+  flex: none;
+  margin-left: 8px;
+}
+
+button.dock__user {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.dock__user--pill {
+  width: auto;
+  gap: 10px;
+  padding: 0 10px 0 4px;
+}
+
+/* Signed-out "Sign In" button */
+.dock__user--text {
+  width: auto;
+  padding: 0 15px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dock__avatar {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dock__avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dock__avatar .dock__avatar-default {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.dock__username {
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dock__chevron {
+  flex: none;
+  opacity: 0.7;
+}
+
+.dock__menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 60;
+  box-sizing: border-box;
+  width: 220px;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #0a0a0a;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+.dock__menu-item {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.dock__menu-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dock__menu-item--danger {
+  color: #f87171;
+}
+
+.dock__menu-item--danger:hover {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+/* Icons are recoloured with a mask so they follow the text colour (white / red) */
+.dock__menu-icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  background: currentColor;
+  -webkit-mask: center / contain no-repeat;
+  mask: center / contain no-repeat;
+}
+
+.dock__menu-sep {
+  height: 1px;
+  margin: 6px 4px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dock a:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .dock__links {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .dock__link,
+  .dock__discord,
+  .dock__discord:hover::after,
+  .dock__hl,
+  .dock__hl--slide,
+  .dock__bar,
+  .dock__text,
+  .dock__links {
+    transition: none !important;
+  }
+}
+
+/* Ink ridges background: sits at the top of the page and scrolls away with
+   the content. */
+.ridges {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ridges__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ridges__fade {
+  position: absolute;
+  inset: 0;
+}
+/* Sign up page */
+.auth {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 84px 16px 32px; /* clears the dock */
+}
+
+.auth__card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: min(400px, 100%);
+  padding: 28px 24px 22px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.auth__logo {
+  display: block;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 14px;
+  object-fit: contain;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.auth__title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.auth__sub {
+  margin: 6px 0 22px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.auth__label {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.auth__input,
+.auth__handle {
+  box-sizing: border-box;
+  width: 100%;
+  margin-bottom: 14px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  transition: border-color 0.15s ease;
+}
+
+.auth__input {
+  padding: 11px 12px;
+  outline: 0;
+}
+
+.auth__input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.auth__input:focus,
+.auth__handle:focus-within {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.auth__handle {
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+}
+
+.auth__prefix {
+  flex: none;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.auth__input--bare {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 11px 12px 11px 0;
+  border: 0;
+  background: transparent;
+}
+
+/* Password strength: three bars that slide open under the password box */
+.auth__input[name="password"] {
+  margin-bottom: 0;
+}
+
+.auth__strength {
+  display: grid;
+  grid-template-rows: 0fr;
+  padding-bottom: 14px;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.25s ease;
+  --bar: rgba(255, 255, 255, 0.35);
+}
+
+.auth__strength[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.auth__strength[data-level="1"] {
+  --bar: #ef4444;
+}
+
+.auth__strength[data-level="2"] {
+  --bar: #eab308;
+}
+
+.auth__strength[data-level="3"] {
+  --bar: #22c55e;
+}
+
+.auth__strength-inner {
+  display: flex;
+  gap: 6px;
+  min-height: 0;
+  padding-top: 10px;
+  overflow: hidden;
+}
+
+.auth__bar {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+/* Fill slides in from the left and the colour fades between levels */
+.auth__bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--bar);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition:
+    transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+    background-color 0.35s ease;
+}
+
+.auth__strength[data-level="1"] .auth__bar:nth-child(-n + 1)::after,
+.auth__strength[data-level="2"] .auth__bar:nth-child(-n + 2)::after,
+.auth__strength[data-level="3"] .auth__bar:nth-child(-n + 3)::after {
+  transform: scaleX(1);
+}
+
+.auth__bar:nth-child(2)::after {
+  transition-delay: 0.05s, 0s;
+}
+
+.auth__bar:nth-child(3)::after {
+  transition-delay: 0.1s, 0s;
+}
+
+/* Cloudflare Turnstile widget (flexible size is 65px tall) */
+.auth__turnstile {
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.auth__turnstile iframe {
+  display: block;
+}
+
+.auth__error {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: #ff8a8a;
+}
+
+.auth__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+  min-height: 42px;
+  border: 0;
+  border-radius: 6px;
+  background: #f4f4f4;
+  color: #000;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease,
+    opacity 0.15s ease;
+}
+
+.auth__btn:hover {
+  background: #fff;
+}
+
+.auth__btn:active {
+  transform: scale(0.98);
+}
+
+.auth__btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.auth__btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+}
+
+.auth__foot {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.auth__foot a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.auth__foot a:hover {
+  text-decoration: underline;
+}
