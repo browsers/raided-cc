@@ -419,6 +419,14 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
+.assets__group + .assets__group {
+  margin-top: 16px;
+}
+
+.assets__group--empty .assets__title {
+  margin-bottom: 4px;
+}
+
 .assets__title {
   margin: 4px 0 16px 4px;
   font-size: 22px;

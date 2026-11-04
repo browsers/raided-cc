@@ -165,6 +165,11 @@ export default function AssetsPanel({
         ))}
         </div>
       </div>
+
+      {/* Card settings box. Empty for now. */}
+      <div className="assets__group assets__group--empty">
+        <h2 className="assets__title">Card</h2>
+      </div>
     </div>
   );
 }
