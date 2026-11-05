@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-export type Section = "overview" | "settings" | "badges" | "assets" | "description" | "misc";
+export type Section = "overview" | "settings" | "badges" | "assets" | "description" | "misc" | "sections";
 
 const ACCOUNT_ITEMS: { label: string; id: Section }[] = [
   { label: "Overview", id: "overview" },
@@ -14,6 +14,7 @@ const COMPONENT_ITEMS: { label: string; id: Section; icon: string }[] = [
   { label: "Assets", id: "assets", icon: "/icons/asset.png" },
   { label: "Description", id: "description", icon: "/icons/description.png" },
   { label: "Miscs", id: "misc", icon: "/icons/misc.png" },
+  { label: "Sections", id: "sections", icon: "/icons/sections.png" },
 ];
 
 // Sidebar nav. Switching items changes the panel, never the URL.
