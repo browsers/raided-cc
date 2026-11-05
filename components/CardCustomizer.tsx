@@ -230,8 +230,11 @@ export default function CardCustomizer({
           <span className="tprev__host tip-host" tabIndex={0}>
             Hover me
             <span className="tip" role="tooltip">
-              <span className="tip__label">UID</span>
-              <span className="tip__value">1</span>
+              <span className="tip__body">
+                <span className="tip__label">UID</span>
+                <span className="tip__value">1</span>
+              </span>
+              <span className="tip__tail" aria-hidden="true" />
             </span>
           </span>
         </div>

@@ -1,22 +1,18 @@
 /* Tooltip bubbles (UID on the name, views on the eye). Shared by the public
    profile and the dashboard's live preview. Look comes from CSS variables set
-   by tooltipVars() in lib/profile-settings.ts; animation from data-tip-anim. */
+   by tooltipVars() in lib/profile-settings.ts; animation from data-tip-anim.
+
+   Structure:  .tip  >  .tip__body (the bubble)  +  .tip__tail (the pointer)
+   The bubble's bottom border has a gap exactly where the pointer joins, and
+   the pointer draws its own two slanted border lines, so bubble + pointer read
+   as ONE continuous outline with nothing across the join. */
 .tip {
   position: absolute;
   left: 50%;
-  bottom: calc(100% + 12px);
+  bottom: calc(100% + 14px);
   z-index: 10;
-  display: inline-flex;
-  align-items: baseline;
-  gap: 7px;
-  padding: 8px 14px;
-  border-radius: var(--tip-radius, 12px);
-  border: 1px solid var(--tip-border, rgba(255, 255, 255, 0.12));
-  background: var(--tip-bg, rgba(22, 22, 22, 0.82));
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  backdrop-filter: blur(14px) saturate(140%);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  color: var(--tip-color, #fff);
+  display: block;
+  width: max-content;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0;
@@ -33,22 +29,73 @@
     transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Pointer under the bubble. A rotated square, clipped to its lower triangle so
-   only the outside half shows. Its centre sits on the bubble's bottom border,
-   so it joins the bubble with no gap. */
-.tip::after {
+/* soft drop shadow behind the bubble (a mask on the bubble would clip its own) */
+.tip::before {
   content: "";
   position: absolute;
-  left: 50%;
-  bottom: -5px;
-  width: 10px;
-  height: 10px;
+  inset: 0;
+  z-index: -1;
+  border-radius: var(--tip-radius, 12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+}
+
+.tip__body {
+  --gap: 16px; /* width of the opening in the bottom border = width of the pointer */
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: var(--tip-radius, 12px);
+  border: 1px solid var(--tip-border, rgba(255, 255, 255, 0.12));
   background: var(--tip-bg, rgba(22, 22, 22, 0.82));
-  border-right: 1px solid var(--tip-border, rgba(255, 255, 255, 0.12));
-  border-bottom: 1px solid var(--tip-border, rgba(255, 255, 255, 0.12));
-  clip-path: polygon(100% 0, 100% 100%, 0 100%);
-  transform: translateX(-50%) rotate(45deg);
-  border-bottom-right-radius: 2px;
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  color: var(--tip-color, #fff);
+  /* Everything visible except the bottom 1px row's middle: the opening for the pointer */
+  -webkit-mask:
+    linear-gradient(#000 0 0) top / 100% calc(100% - 1px) no-repeat,
+    linear-gradient(
+        to right,
+        #000 calc(50% - var(--gap) / 2),
+        transparent calc(50% - var(--gap) / 2) calc(50% + var(--gap) / 2),
+        #000 calc(50% + var(--gap) / 2)
+      )
+      bottom / 100% 1px no-repeat;
+  mask:
+    linear-gradient(#000 0 0) top / 100% calc(100% - 1px) no-repeat,
+    linear-gradient(
+        to right,
+        #000 calc(50% - var(--gap) / 2),
+        transparent calc(50% - var(--gap) / 2) calc(50% + var(--gap) / 2),
+        #000 calc(50% + var(--gap) / 2)
+      )
+      bottom / 100% 1px no-repeat;
+}
+
+/* Pointer: a triangle filled like the bubble, starting on the bubble's bottom
+   border row so it covers the opening with a single layer of fill. */
+.tip__tail {
+  position: absolute;
+  left: 50%;
+  top: calc(100% - 1px);
+  width: 16px;
+  height: 8px;
+  transform: translateX(-50%);
+  background: var(--tip-bg, rgba(22, 22, 22, 0.82));
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+/* ...and its border: just the two slanted edges (a 1px-thick V), which meet
+   the bubble's bottom border at both sides of the opening. */
+.tip__tail::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--tip-border, rgba(255, 255, 255, 0.12));
+  clip-path: polygon(0 0, 50% 100%, 100% 0, calc(100% - 1.414px) 0, 50% calc(100% - 1.414px), 1.414px 0);
 }
 
 .tip__label {

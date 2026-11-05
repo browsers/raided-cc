@@ -148,8 +148,11 @@ export default async function ProfilePage({
               {name}
               {uid !== null && (
                 <span className="tip" role="tooltip">
-                  <span className="tip__label">UID</span>
-                  <span className="tip__value">{uid}</span>
+                  <span className="tip__body">
+                    <span className="tip__label">UID</span>
+                    <span className="tip__value">{uid}</span>
+                  </span>
+                  <span className="tip__tail" aria-hidden="true" />
                 </span>
               )}
             </span>
@@ -165,8 +168,11 @@ export default async function ProfilePage({
               </svg>
               {views.toLocaleString("en-US")}
               <span className="tip" role="tooltip">
-                <span className="tip__value">{views.toLocaleString("en-US")}</span>
-                <span className="tip__label">{views === 1 ? "view" : "views"}</span>
+                <span className="tip__body">
+                  <span className="tip__value">{views.toLocaleString("en-US")}</span>
+                  <span className="tip__label">{views === 1 ? "view" : "views"}</span>
+                </span>
+                <span className="tip__tail" aria-hidden="true" />
               </span>
             </span>
           )}
