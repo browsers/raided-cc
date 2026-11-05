@@ -14,10 +14,10 @@ const COMPONENT_ITEMS: { label: string; id: Section; icon: string }[] = [
   { label: "Assets", id: "assets", icon: "/icons/asset.png" },
   { label: "Description", id: "description", icon: "/icons/description.png" },
   { label: "Miscs", id: "misc", icon: "/icons/misc.png" },
-  { label: "Sections", id: "sections", icon: "/icons/widgets.png" },
-  { label: "Widgets", id: "widgets", icon: "/icons/sections.png"},
-  { label: "Projects", id: "projects", icon: "/icons/projects.png"},
-  { label: "Links", id: "Links", icon: "/icons/links.ong"}
+  { label: "Sections", id: "sections", icon: "/icons/sections.png" },
+  { label: "Widgets", id: "widgets", icon: "/icons/widgets.png" },
+  { label: "Projects", id: "projects", icon: "/icons/projects.png" },
+  { label: "Links", id: "links", icon: "/icons/links.png" },
 ];
 
 // Sidebar nav. Switching items changes the panel, never the URL.
