@@ -15,6 +15,7 @@ import {
 } from "../../lib/profile-settings";
 import ProfileBackdrop from "../../components/ProfileBackdrop";
 import CursorPet from "../../components/CursorPet";
+import Tip from "../../components/Tip";
 import "../avatar.css";
 import "../tooltip.css";
 import "./profile.css";
@@ -151,13 +152,10 @@ export default async function ProfilePage({
             <span className="profile__name-hover tip-host" tabIndex={uid !== null ? 0 : undefined}>
               {name}
               {uid !== null && (
-                <span className="tip" role="tooltip">
-                  <span className="tip__body">
-                    <span className="tip__label">UID</span>
-                    <span className="tip__value">{uid}</span>
-                  </span>
-                  <span className="tip__tail" aria-hidden="true" />
-                </span>
+                <Tip shape={tooltip.shape}>
+                  <span className="tip__label">UID</span>
+                  <span className="tip__value">{uid}</span>
+                </Tip>
               )}
             </span>
           </h1>
@@ -171,13 +169,10 @@ export default async function ProfilePage({
                 />
               </svg>
               {views.toLocaleString("en-US")}
-              <span className="tip" role="tooltip">
-                <span className="tip__body">
-                  <span className="tip__value">{views.toLocaleString("en-US")}</span>
-                  <span className="tip__label">{views === 1 ? "view" : "views"}</span>
-                </span>
-                <span className="tip__tail" aria-hidden="true" />
-              </span>
+              <Tip shape={tooltip.shape}>
+                <span className="tip__value">{views.toLocaleString("en-US")}</span>
+                <span className="tip__label">{views === 1 ? "view" : "views"}</span>
+              </Tip>
             </span>
           )}
         </main>

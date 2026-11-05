@@ -2,6 +2,7 @@
 
 import "../app/avatar.css";
 import "../app/tooltip.css";
+import Tip from "./Tip";
 import {
   AVATAR_SHAPES,
   BORDER_STYLES,
@@ -229,13 +230,10 @@ export default function CardCustomizer({
         <div className="panel__preview tprev" data-tip-anim={tooltip.animation} style={tooltipVars(tooltip) as React.CSSProperties}>
           <span className="tprev__host tip-host" tabIndex={0}>
             Hover me
-            <span className="tip" role="tooltip">
-              <span className="tip__body">
-                <span className="tip__label">UID</span>
-                <span className="tip__value">1</span>
-              </span>
-              <span className="tip__tail" aria-hidden="true" />
-            </span>
+            <Tip shape={tooltip.shape}>
+              <span className="tip__label">UID</span>
+              <span className="tip__value">1</span>
+            </Tip>
           </span>
         </div>
 
