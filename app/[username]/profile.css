@@ -62,7 +62,7 @@
   width: 100%;
   padding: 22px;
   border-radius: 26px;
-  background: #141414; /* dark grey */
+  background: rgba(20, 20, 20, var(--card-alpha, 1)); /* dark grey, opacity set in the dashboard */
 }
 
 .profile__name {

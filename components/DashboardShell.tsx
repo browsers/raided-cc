@@ -12,16 +12,19 @@ export default function DashboardShell({
   image: initialImage,
   uid,
   background: initialBackground,
+  cardOpacity: initialCardOpacity,
 }: {
   username: string;
   displayName: string;
   image: string | null;
   uid: number | null;
   background: Background | null;
+  cardOpacity: number;
 }) {
   const [section, setSection] = useState<Section>("overview");
   const [image, setImage] = useState<string | null>(initialImage);
   const [background, setBackground] = useState<Background | null>(initialBackground);
+  const [cardOpacity, setCardOpacity] = useState(initialCardOpacity);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -173,7 +176,7 @@ export default function DashboardShell({
         {section === "overview" && null}
         {section === "settings" && null}
         {section === "badges" && null}
-        {section === "assets" && <AssetsPanel image={image} onAvatar={setImage} background={background} onBackground={setBackground} />}
+        {section === "assets" && <AssetsPanel image={image} onAvatar={setImage} background={background} onBackground={setBackground} cardOpacity={cardOpacity} onCardOpacity={setCardOpacity} />}
         {section === "description" && null}
       </main>
     </>

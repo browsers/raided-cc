@@ -3,6 +3,7 @@ import DashboardShell from "../../components/DashboardShell";
 import { getAuth } from "../../lib/auth";
 import { getDB } from "../../lib/db";
 import { backgroundFromKey, type Background } from "../../lib/r2";
+import { cardOpacityFrom, parseSettings } from "../../lib/profile-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -31,13 +32,15 @@ export default async function DashboardPage() {
   }
 
   let background: Background | null = null;
+  let cardOpacity = 100;
   if (session?.user?.id) {
     try {
       const row = await getDB()
-        .prepare("SELECT background_key FROM profiles WHERE user_id = ?")
+        .prepare("SELECT background_key, settings FROM profiles WHERE user_id = ?")
         .bind(session.user.id)
-        .first<{ background_key: string | null }>();
+        .first<{ background_key: string | null; settings: string | null }>();
       background = backgroundFromKey(row?.background_key);
+      cardOpacity = cardOpacityFrom(parseSettings(row?.settings));
     } catch {}
   }
 
@@ -48,6 +51,7 @@ export default async function DashboardPage() {
       image={user?.image ?? null}
       uid={uid}
       background={background}
+      cardOpacity={cardOpacity}
     />
   );
 }

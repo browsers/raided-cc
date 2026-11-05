@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getDB } from "../../lib/db";
 import { countUniqueView } from "../../lib/views";
 import { backgroundFromKey } from "../../lib/r2";
+import { cardOpacityFrom, parseSettings } from "../../lib/profile-settings";
 import ProfileBackdrop from "../../components/ProfileBackdrop";
 import "./profile.css";
 
@@ -53,16 +54,19 @@ async function getUid(userId: string): Promise<number | null> {
   }
 }
 
-/** Background upload for this profile, or null (also null if the column is missing). */
-async function getBackground(userId: string) {
+/** Background and card settings for this profile (defaults if the row/columns are missing). */
+async function getLook(userId: string) {
   try {
     const row = await getDB()
-      .prepare("SELECT background_key FROM profiles WHERE user_id = ?")
+      .prepare("SELECT background_key, settings FROM profiles WHERE user_id = ?")
       .bind(userId)
-      .first<{ background_key: string | null }>();
-    return backgroundFromKey(row?.background_key);
+      .first<{ background_key: string | null; settings: string | null }>();
+    return {
+      background: backgroundFromKey(row?.background_key),
+      cardOpacity: cardOpacityFrom(parseSettings(row?.settings)),
+    };
   } catch {
-    return null;
+    return { background: null, cardOpacity: 100 };
   }
 }
 
@@ -88,14 +92,17 @@ export default async function ProfilePage({
 
   const views = await countUniqueView(user.id);
   const uid = await getUid(user.id);
-  const background = await getBackground(user.id);
+  const { background, cardOpacity } = await getLook(user.id);
   const name = user.displayUsername || user.username;
 
   return (
     <div className="profile">
       {background && <ProfileBackdrop src={background.url} kind={background.kind} />}
       <div className="profile__stack">
-        <main className="profile__card">
+        <main
+          className="profile__card"
+          style={{ "--card-alpha": cardOpacity / 100 } as React.CSSProperties}
+        >
           {/* Default pfp for now; uploads come later */}
           <div className="profile__avatar">
             {user.image ? (

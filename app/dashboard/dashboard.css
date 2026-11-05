@@ -407,7 +407,15 @@
 }
 /* Assets tab: one rectangle holding the three upload boxes */
 .assets {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%; /* lets the Card box stretch down to the bottom of the panel */
   padding: 24px;
+}
+
+.assets__group--fill {
+  flex: 1 1 auto;
 }
 
 .assets__group {
@@ -421,10 +429,6 @@
 
 .assets__group + .assets__group {
   margin-top: 16px;
-}
-
-.assets__group--empty .assets__title {
-  margin-bottom: 4px;
 }
 
 .assets__title {
@@ -530,5 +534,157 @@
 @media (max-width: 900px) {
   .assets__grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* A single setting row: text on the left, controls on the right */
+.setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.setting__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.setting__name {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.setting__desc {
+  font-size: 14px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.setting__controls {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.setting__status {
+  min-height: 18px;
+  margin: 10px 4px 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.setting__status[data-error="true"] {
+  color: #ff6b6b;
+}
+
+/* Slider: thin track that fills white up to the value, square-ish thumb */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 240px;
+  height: 18px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, #fff var(--fill, 0%), rgba(255, 255, 255, 0.15) var(--fill, 0%));
+}
+
+.slider::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.slider::-moz-range-progress {
+  height: 4px;
+  border-radius: 2px;
+  background: #fff;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 18px;
+  margin-top: -7px;
+  border: 0;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.slider::-moz-range-thumb {
+  width: 14px;
+  height: 18px;
+  border: 0;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.slider:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 4px;
+}
+
+.numbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  height: 38px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.numbox:focus-within {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.numbox input {
+  width: 3ch;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  text-align: right;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.numbox input::-webkit-outer-spin-button,
+.numbox input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .setting {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .setting__controls {
+    justify-content: space-between;
+  }
+  .slider {
+    flex: 1;
+    width: auto;
   }
 }

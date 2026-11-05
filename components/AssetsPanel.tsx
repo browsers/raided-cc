@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { authClient } from "../lib/auth-client";
 import type { Background } from "../lib/r2";
 
@@ -17,16 +17,44 @@ export default function AssetsPanel({
   onAvatar,
   background,
   onBackground,
+  cardOpacity,
+  onCardOpacity,
 }: {
   image: string | null;
   onAvatar: (url: string) => void;
   background: Background | null;
   onBackground: (bg: Background) => void;
+  cardOpacity: number;
+  onCardOpacity: (value: number) => void;
 }) {
   const [over, setOver] = useState<BoxId | null>(null);
   const [busy, setBusy] = useState<BoxId | null>(null);
   const [note, setNote] = useState<{ box: BoxId; text: string; error?: boolean } | null>(null);
   const inputs = useRef<Partial<Record<BoxId, HTMLInputElement | null>>>({});
+
+  // Card opacity: updates instantly, saves a moment after you stop moving it
+  const [opacityStatus, setOpacityStatus] = useState<"" | "saving" | "saved" | "error">("");
+  const saveTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(saveTimer.current), []);
+
+  const changeOpacity = (raw: number) => {
+    const value = Math.min(100, Math.max(0, Math.round(Number.isFinite(raw) ? raw : 0)));
+    onCardOpacity(value);
+    setOpacityStatus("saving");
+    window.clearTimeout(saveTimer.current);
+    saveTimer.current = window.setTimeout(async () => {
+      try {
+        const res = await fetch("/api/card", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ opacity: value }),
+        });
+        setOpacityStatus(res.ok ? "saved" : "error");
+      } catch {
+        setOpacityStatus("error");
+      }
+    }, 400);
+  };
 
   const uploadAvatar = async (file: File) => {
     setBusy("pfp");
@@ -166,9 +194,48 @@ export default function AssetsPanel({
         </div>
       </div>
 
-      {/* Card settings box. Empty for now. */}
-      <div className="assets__group assets__group--empty">
+      {/* Card settings */}
+      <div className="assets__group assets__group--fill">
         <h2 className="assets__title">Card</h2>
+
+        <div className="setting">
+          <div className="setting__text">
+            <span className="setting__name">Profile opacity</span>
+            <span className="setting__desc">
+              How see-through your profile card is. 100% is solid, 0% shows only your background.
+            </span>
+          </div>
+          <div className="setting__controls">
+            <input
+              className="slider"
+              type="range"
+              min={0}
+              max={100}
+              step={1}
+              value={cardOpacity}
+              onChange={(e) => changeOpacity(Number(e.target.value))}
+              style={{ "--fill": `${cardOpacity}%` } as React.CSSProperties}
+              aria-label="Profile opacity"
+            />
+            <label className="numbox">
+              <input
+                type="number"
+                min={0}
+                max={100}
+                value={cardOpacity}
+                onChange={(e) => changeOpacity(e.target.value === "" ? 0 : Number(e.target.value))}
+                aria-label="Profile opacity percent"
+              />
+              <span>%</span>
+            </label>
+          </div>
+        </div>
+
+        <p className="setting__status" data-error={opacityStatus === "error"}>
+          {opacityStatus === "saving" && "Saving..."}
+          {opacityStatus === "saved" && "Saved."}
+          {opacityStatus === "error" && "Couldn't save. Try again."}
+        </p>
       </div>
     </div>
   );
