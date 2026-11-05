@@ -295,7 +295,7 @@ body::-webkit-scrollbar {
 
 .dock__bar {
   --dock-radius: 12px; /* corner roundness of the pill */
-  --dock-drop: 10px; /* how far the top edge comes down */
+  --dock-drop: 4px; /* how far the top edge comes down */
   position: relative;
   isolation: isolate;
   box-sizing: border-box;
@@ -307,7 +307,7 @@ body::-webkit-scrollbar {
   margin: 0 auto;
   /* Top padding includes the drop, so the content sits in the same spot
      whether the glass is attached to the top or floating as a pill. */
-  padding: calc(9px + var(--dock-drop)) 9px 9px 14px;
+  padding: calc(7px + var(--dock-drop)) 8px 7px 14px;
 }
 
 /* The glass layer. Hanging from the top edge: square top, rounded bottom, no
@@ -323,12 +323,11 @@ body::-webkit-scrollbar {
   pointer-events: none;
   box-sizing: border-box;
   border-radius: 0 0 var(--dock-radius) var(--dock-radius);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top-color: transparent;
-  background: rgba(12, 12, 12, 0.55);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-  -webkit-backdrop-filter: blur(14px) saturate(130%);
-  backdrop-filter: blur(14px) saturate(130%);
+  border: 0;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: none;
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  backdrop-filter: blur(22px) saturate(160%);
   transition:
     top 0.5s cubic-bezier(0.32, 0.72, 0, 1),
     border-radius 0.5s cubic-bezier(0.32, 0.72, 0, 1),
@@ -341,9 +340,8 @@ body::-webkit-scrollbar {
 .dock[data-scrolled="true"] .dock__bar::before {
   top: var(--dock-drop);
   border-radius: var(--dock-radius);
-  border-color: rgba(255, 255, 255, 0.12);
-  background: rgba(12, 12, 12, 0.72);
-  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: none;
 }
 
 .dock a {
