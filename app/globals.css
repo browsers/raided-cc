@@ -277,12 +277,12 @@ body::-webkit-scrollbar {
   outline-offset: 3px;
 }
 
-/* Top bar -> floating dock (heist.lol style). The bar never changes size.
-   At the top of the page it hangs from the very top edge: straight top
-   corners, rounded bottom corners. After a small scroll it lifts off the edge
-   and its top corners round off, so it becomes a floating rounded bar. The
-   drop and the rounding run on one 0.5s curve, so it reads as a single smooth
-   morph. */
+/* Top bar -> floating pill (heist.lol style).
+   At the top of the page the glass is attached to the top edge: square top
+   corners, rounded bottom corners. After a small scroll the glass's TOP edge
+   slides down and the top corners round off, so the bar morphs into a floating
+   pill. Nothing else moves: the links, buttons and the bottom edge stay put,
+   only the top of the glass comes down. All of it runs on one 0.5s curve. */
 .dock {
   position: fixed;
   top: 0;
@@ -294,7 +294,10 @@ body::-webkit-scrollbar {
 }
 
 .dock__bar {
+  --dock-radius: 12px; /* corner roundness of the pill */
+  --dock-drop: 12px; /* how far the top edge comes down */
   position: relative;
+  isolation: isolate;
   box-sizing: border-box;
   pointer-events: auto;
   display: flex;
@@ -302,30 +305,42 @@ body::-webkit-scrollbar {
   width: 100%;
   max-width: 960px;
   margin: 0 auto;
-  padding: 8px 8px 8px 16px;
-  will-change: transform;
-  transition:
-    transform 0.5s cubic-bezier(0.32, 0.72, 0, 1),
-    border-radius 0.5s cubic-bezier(0.32, 0.72, 0, 1),
-    background-color 0.4s ease,
-    border-color 0.4s ease,
-    box-shadow 0.4s ease;
-  /* Hanging from the top edge: square top corners, rounded bottom corners */
-  border-radius: 0 0 18px 18px;
-  transform: translateY(0);
-  /* Dark glass. No line along the top edge while it's attached to it. */
+  /* Top padding includes the drop, so the content sits in the same spot
+     whether the glass is attached to the top or floating as a pill. */
+  padding: calc(8px + var(--dock-drop)) 8px 8px 16px;
+}
+
+/* The glass layer. Hanging from the top edge: square top, rounded bottom, no
+   line along the top edge while it's attached to it. */
+.dock__bar::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  box-sizing: border-box;
+  border-radius: 0 0 var(--dock-radius) var(--dock-radius);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-top-color: transparent;
   background: rgba(12, 12, 12, 0.55);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
   -webkit-backdrop-filter: blur(14px) saturate(130%);
   backdrop-filter: blur(14px) saturate(130%);
+  transition:
+    top 0.5s cubic-bezier(0.32, 0.72, 0, 1),
+    border-radius 0.5s cubic-bezier(0.32, 0.72, 0, 1),
+    background-color 0.4s ease,
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
 }
 
-/* Scrolled: lifts off the edge, top corners round, glass firms up a little */
-.dock[data-scrolled="true"] .dock__bar {
-  border-radius: 18px;
-  transform: translateY(12px);
+/* Scrolled: the top edge comes down, top corners round, glass firms up a little */
+.dock[data-scrolled="true"] .dock__bar::before {
+  top: var(--dock-drop);
+  border-radius: var(--dock-radius);
   border-color: rgba(255, 255, 255, 0.12);
   background: rgba(12, 12, 12, 0.72);
   box-shadow: 0 10px 36px rgba(0, 0, 0, 0.4);
@@ -673,7 +688,7 @@ button.dock__user {
   .dock__hl,
   .dock__hl--slide,
   .dock__bar,
-  .dock::before,
+  .dock__bar::before,
   .dock__links {
     transition: none !important;
   }
