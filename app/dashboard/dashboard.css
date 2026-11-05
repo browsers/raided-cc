@@ -286,8 +286,35 @@
 }
 
 /* The grey highlight is the sliding .dnav__pill, not per-item backgrounds */
+/* Scrolls on its own when the list is taller than the sidebar, so the items
+   never run under the pinned account card. */
 .dnav {
   position: relative;
+  flex: 0 1 auto;
+  min-height: 0;
+  margin-bottom: 8px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.dnav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dnav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dnav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+}
+
+.dnav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .dnav__pill {

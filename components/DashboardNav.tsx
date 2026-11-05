@@ -65,7 +65,8 @@ export default function DashboardNav({
     wasVisible.current = true;
     setPill({
       x: t.left - n.left,
-      y: t.top - n.top,
+      // + scrollTop: the pill lives inside the scrolling nav
+      y: t.top - n.top + nav.scrollTop,
       w: t.width,
       h: t.height,
       r: parseFloat(getComputedStyle(target).borderRadius) || 12,
