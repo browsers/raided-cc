@@ -3,8 +3,16 @@ import { notFound } from "next/navigation";
 import { getDB } from "../../lib/db";
 import { countUniqueView } from "../../lib/views";
 import { backgroundFromKey } from "../../lib/r2";
-import { cardOpacityFrom, parseSettings } from "../../lib/profile-settings";
+import {
+  avatarFrom,
+  avatarRadius,
+  cardOpacityFrom,
+  parseSettings,
+  tooltipFrom,
+  tooltipVars,
+} from "../../lib/profile-settings";
 import ProfileBackdrop from "../../components/ProfileBackdrop";
+import "../tooltip.css";
 import "./profile.css";
 
 export const dynamic = "force-dynamic";
@@ -61,12 +69,21 @@ async function getLook(userId: string) {
       .prepare("SELECT background_key, settings FROM profiles WHERE user_id = ?")
       .bind(userId)
       .first<{ background_key: string | null; settings: string | null }>();
+    const settings = parseSettings(row?.settings);
     return {
       background: backgroundFromKey(row?.background_key),
-      cardOpacity: cardOpacityFrom(parseSettings(row?.settings)),
+      cardOpacity: cardOpacityFrom(settings),
+      avatar: avatarFrom(settings),
+      tooltip: tooltipFrom(settings),
     };
   } catch {
-    return { background: null, cardOpacity: 100 };
+    const settings = {};
+    return {
+      background: null,
+      cardOpacity: 100,
+      avatar: avatarFrom(settings),
+      tooltip: tooltipFrom(settings),
+    };
   }
 }
 
@@ -92,7 +109,7 @@ export default async function ProfilePage({
 
   const views = await countUniqueView(user.id);
   const uid = await getUid(user.id);
-  const { background, cardOpacity } = await getLook(user.id);
+  const { background, cardOpacity, avatar, tooltip } = await getLook(user.id);
   const name = user.displayUsername || user.username;
 
   return (
@@ -101,7 +118,14 @@ export default async function ProfilePage({
       <div className="profile__stack">
         <main
           className="profile__card"
-          style={{ "--card-alpha": cardOpacity / 100 } as React.CSSProperties}
+          data-tip-anim={tooltip.animation}
+          style={
+            {
+              "--card-alpha": cardOpacity / 100,
+              "--avatar-radius": avatarRadius(avatar),
+              ...tooltipVars(tooltip),
+            } as React.CSSProperties
+          }
         >
           {/* Default pfp for now; uploads come later */}
           <div className="profile__avatar">

@@ -3,7 +3,14 @@ import DashboardShell from "../../components/DashboardShell";
 import { getAuth } from "../../lib/auth";
 import { getDB } from "../../lib/db";
 import { backgroundFromKey, type Background } from "../../lib/r2";
-import { cardOpacityFrom, parseSettings } from "../../lib/profile-settings";
+import {
+  avatarFrom,
+  cardOpacityFrom,
+  parseSettings,
+  tooltipFrom,
+  type AvatarSettings,
+  type TooltipSettings,
+} from "../../lib/profile-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +40,8 @@ export default async function DashboardPage() {
 
   let background: Background | null = null;
   let cardOpacity = 100;
+  let avatar: AvatarSettings = avatarFrom({});
+  let tooltip: TooltipSettings = tooltipFrom({});
   if (session?.user?.id) {
     try {
       const row = await getDB()
@@ -40,7 +49,10 @@ export default async function DashboardPage() {
         .bind(session.user.id)
         .first<{ background_key: string | null; settings: string | null }>();
       background = backgroundFromKey(row?.background_key);
-      cardOpacity = cardOpacityFrom(parseSettings(row?.settings));
+      const settings = parseSettings(row?.settings);
+      cardOpacity = cardOpacityFrom(settings);
+      avatar = avatarFrom(settings);
+      tooltip = tooltipFrom(settings);
     } catch {}
   }
 
@@ -52,6 +64,8 @@ export default async function DashboardPage() {
       uid={uid}
       background={background}
       cardOpacity={cardOpacity}
+      avatarLayout={avatar}
+      tooltip={tooltip}
     />
   );
 }

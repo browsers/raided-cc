@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { authClient } from "../lib/auth-client";
 import type { Background } from "../lib/r2";
+import type { AvatarSettings, TooltipSettings } from "../lib/profile-settings";
+import CardCustomizer from "./CardCustomizer";
 
 type BoxId = "pfp" | "background" | "music";
 
@@ -19,6 +21,10 @@ export default function AssetsPanel({
   onBackground,
   cardOpacity,
   onCardOpacity,
+  avatarLayout,
+  onAvatarLayout,
+  tooltip,
+  onTooltip,
 }: {
   image: string | null;
   onAvatar: (url: string) => void;
@@ -26,34 +32,65 @@ export default function AssetsPanel({
   onBackground: (bg: Background) => void;
   cardOpacity: number;
   onCardOpacity: (value: number) => void;
+  avatarLayout: AvatarSettings;
+  onAvatarLayout: (next: AvatarSettings) => void;
+  tooltip: TooltipSettings;
+  onTooltip: (next: TooltipSettings) => void;
 }) {
   const [over, setOver] = useState<BoxId | null>(null);
   const [busy, setBusy] = useState<BoxId | null>(null);
   const [note, setNote] = useState<{ box: BoxId; text: string; error?: boolean } | null>(null);
   const inputs = useRef<Partial<Record<BoxId, HTMLInputElement | null>>>({});
 
-  // Card opacity: updates instantly, saves a moment after you stop moving it
-  const [opacityStatus, setOpacityStatus] = useState<"" | "saving" | "saved" | "error">("");
+  // Card settings: the screen updates instantly, and everything changed is saved
+  // in one request a moment after you stop touching the controls.
+  const [cardStatus, setCardStatus] = useState<"" | "saving" | "saved" | "error">("");
+  const pending = useRef<Record<string, unknown>>({});
   const saveTimer = useRef<number | undefined>(undefined);
-  useEffect(() => () => window.clearTimeout(saveTimer.current), []);
+
+  const flush = async () => {
+    const body = pending.current;
+    pending.current = {};
+    if (Object.keys(body).length === 0) return;
+    try {
+      const res = await fetch("/api/card", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      setCardStatus(res.ok ? "saved" : "error");
+    } catch {
+      setCardStatus("error");
+    }
+  };
+
+  const saveCard = (patch: Record<string, unknown>) => {
+    pending.current = { ...pending.current, ...patch };
+    setCardStatus("saving");
+    window.clearTimeout(saveTimer.current);
+    saveTimer.current = window.setTimeout(() => void flush(), 400);
+  };
+
+  // Leaving the tab mid-wait: send what's left instead of dropping it
+  useEffect(
+    () => () => {
+      window.clearTimeout(saveTimer.current);
+      if (Object.keys(pending.current).length > 0) {
+        void fetch("/api/card", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(pending.current),
+          keepalive: true,
+        }).catch(() => {});
+      }
+    },
+    [],
+  );
 
   const changeOpacity = (raw: number) => {
     const value = Math.min(100, Math.max(0, Math.round(Number.isFinite(raw) ? raw : 0)));
     onCardOpacity(value);
-    setOpacityStatus("saving");
-    window.clearTimeout(saveTimer.current);
-    saveTimer.current = window.setTimeout(async () => {
-      try {
-        const res = await fetch("/api/card", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ opacity: value }),
-        });
-        setOpacityStatus(res.ok ? "saved" : "error");
-      } catch {
-        setOpacityStatus("error");
-      }
-    }, 400);
+    saveCard({ opacity: value });
   };
 
   const uploadAvatar = async (file: File) => {
@@ -231,10 +268,24 @@ export default function AssetsPanel({
           </div>
         </div>
 
-        <p className="setting__status" data-error={opacityStatus === "error"}>
-          {opacityStatus === "saving" && "Saving..."}
-          {opacityStatus === "saved" && "Saved."}
-          {opacityStatus === "error" && "Couldn't save. Try again."}
+        <CardCustomizer
+          image={image}
+          avatar={avatarLayout}
+          onAvatar={(next) => {
+            onAvatarLayout(next);
+            saveCard({ avatar: next });
+          }}
+          tooltip={tooltip}
+          onTooltip={(next) => {
+            onTooltip(next);
+            saveCard({ tooltip: next });
+          }}
+        />
+
+        <p className="setting__status" data-error={cardStatus === "error"}>
+          {cardStatus === "saving" && "Saving..."}
+          {cardStatus === "saved" && "Saved."}
+          {cardStatus === "error" && "Couldn't save. Try again."}
         </p>
       </div>
     </div>

@@ -31,7 +31,7 @@
   justify-content: center;
   width: 132px;
   height: 132px;
-  border-radius: 14px;
+  border-radius: var(--avatar-radius, 14px);
   overflow: hidden;
   background: none;
 }
@@ -85,72 +85,6 @@
   cursor: default;
 }
 
-.tip {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 12px);
-  z-index: 10;
-  display: inline-flex;
-  align-items: baseline;
-  gap: 7px;
-  padding: 8px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(22, 22, 22, 0.82);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  backdrop-filter: blur(14px) saturate(140%);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0;
-  line-height: 1;
-  text-align: left;
-  text-shadow: none;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transform: translate(-50%, 8px) scale(0.9);
-  transform-origin: 50% 100%;
-  transition:
-    opacity 0.16s ease,
-    transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* little pointer under the pill */
-.tip::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -5px;
-  width: 8px;
-  height: 8px;
-  background: rgba(22, 22, 22, 0.95);
-  border-right: 1px solid rgba(255, 255, 255, 0.12);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  transform: translateX(-50%) rotate(45deg);
-  border-bottom-right-radius: 2px;
-}
-
-.tip__label {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.tip__value {
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.tip-host:hover > .tip,
-.tip-host:focus-visible > .tip {
-  opacity: 1;
-  transform: translate(-50%, 0) scale(1);
-  transition-delay: 0.05s;
-}
 
 .profile__views {
   position: absolute;

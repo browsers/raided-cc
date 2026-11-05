@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { authClient } from "../lib/auth-client";
 import AssetsPanel from "./AssetsPanel";
 import type { Background } from "../lib/r2";
+import type { AvatarSettings, TooltipSettings } from "../lib/profile-settings";
 import DashboardNav, { type Section } from "./DashboardNav";
 
 export default function DashboardShell({
@@ -13,6 +14,8 @@ export default function DashboardShell({
   uid,
   background: initialBackground,
   cardOpacity: initialCardOpacity,
+  avatarLayout: initialAvatarLayout,
+  tooltip: initialTooltip,
 }: {
   username: string;
   displayName: string;
@@ -20,11 +23,15 @@ export default function DashboardShell({
   uid: number | null;
   background: Background | null;
   cardOpacity: number;
+  avatarLayout: AvatarSettings;
+  tooltip: TooltipSettings;
 }) {
   const [section, setSection] = useState<Section>("overview");
   const [image, setImage] = useState<string | null>(initialImage);
   const [background, setBackground] = useState<Background | null>(initialBackground);
   const [cardOpacity, setCardOpacity] = useState(initialCardOpacity);
+  const [avatarLayout, setAvatarLayout] = useState(initialAvatarLayout);
+  const [tooltip, setTooltip] = useState(initialTooltip);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -176,7 +183,20 @@ export default function DashboardShell({
         {section === "overview" && null}
         {section === "settings" && null}
         {section === "badges" && null}
-        {section === "assets" && <AssetsPanel image={image} onAvatar={setImage} background={background} onBackground={setBackground} cardOpacity={cardOpacity} onCardOpacity={setCardOpacity} />}
+        {section === "assets" && (
+          <AssetsPanel
+            image={image}
+            onAvatar={setImage}
+            background={background}
+            onBackground={setBackground}
+            cardOpacity={cardOpacity}
+            onCardOpacity={setCardOpacity}
+            avatarLayout={avatarLayout}
+            onAvatarLayout={setAvatarLayout}
+            tooltip={tooltip}
+            onTooltip={setTooltip}
+          />
+        )}
         {section === "description" && null}
       </main>
     </>
