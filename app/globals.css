@@ -281,16 +281,19 @@ body::-webkit-scrollbar {
   outline-offset: 3px;
 }
 
-/* Top bar -> dock. At the top of the page it is a wide, rounded glass bar
-   (inset from the edges, like heist.lol). After a small scroll it shrinks
-   into a compact floating dock: link labels fold away and only icons stay. */
+/* Top bar -> dock (heist.lol style).
+   At the top of the page the bar hangs from the very top edge: straight top
+   corners, rounded bottom corners. After a small scroll it drops away from the
+   edge, its top corners round off and it shrinks into a compact floating dock
+   (link labels fold away, only icons stay). All of that runs on one 0.5s
+   curve so it reads as a single smooth morph. */
 .dock {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 50;
-  padding: max(12px, env(safe-area-inset-top)) 16px 0;
+  padding: env(safe-area-inset-top, 0px) 16px 0;
   pointer-events: none;
 }
 
@@ -304,24 +307,30 @@ body::-webkit-scrollbar {
   max-width: 960px;
   margin: 0 auto;
   padding: 8px 8px 8px 16px;
-  will-change: width;
+  will-change: width, transform;
   transition:
     width 0.5s cubic-bezier(0.32, 0.72, 0, 1),
+    transform 0.5s cubic-bezier(0.32, 0.72, 0, 1),
+    border-radius 0.5s cubic-bezier(0.32, 0.72, 0, 1),
     background-color 0.4s ease,
     border-color 0.4s ease,
     box-shadow 0.4s ease;
-  border-radius: 14px;
-  /* Dark glass, same look expanded and collapsed (only the shadow and
-     opacity firm up when it becomes the dock) */
+  /* Hanging from the top edge: square top corners, rounded bottom corners */
+  border-radius: 0 0 18px 18px;
+  transform: translateY(0);
+  /* Dark glass. No line along the top edge while it's attached to it. */
   border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top-color: transparent;
   background: rgba(12, 12, 12, 0.55);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
   -webkit-backdrop-filter: blur(14px) saturate(130%);
   backdrop-filter: blur(14px) saturate(130%);
 }
 
-/* Collapsed: the dock firms up a little */
+/* Collapsed: lifts off the edge, top corners round, glass firms up a little */
 .dock[data-collapsed="true"] .dock__bar {
+  border-radius: 18px;
+  transform: translateY(12px);
   border-color: rgba(255, 255, 255, 0.12);
   background: rgba(12, 12, 12, 0.72);
   box-shadow: 0 10px 36px rgba(0, 0, 0, 0.4);
