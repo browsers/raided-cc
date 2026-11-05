@@ -23,8 +23,6 @@ body {
 html {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none;
-  /* Snap to whole sections; "mandatory" settles on one after every scroll */
-  scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
   overscroll-behavior-y: none;
 }
@@ -39,8 +37,6 @@ body::-webkit-scrollbar {
 .snap {
   height: 100vh;
   height: 100dvh;
-  scroll-snap-align: start;
-  scroll-snap-stop: always; /* a hard flick can't skip a section */
 }
 
 /* Window light: sits at the top of the page and scrolls away with the content.
@@ -281,12 +277,12 @@ body::-webkit-scrollbar {
   outline-offset: 3px;
 }
 
-/* Top bar -> dock (heist.lol style).
-   At the top of the page the bar hangs from the very top edge: straight top
-   corners, rounded bottom corners. After a small scroll it drops away from the
-   edge, its top corners round off and it shrinks into a compact floating dock
-   (link labels fold away, only icons stay). All of that runs on one 0.5s
-   curve so it reads as a single smooth morph. */
+/* Top bar -> floating dock (heist.lol style). The bar never changes size.
+   At the top of the page it hangs from the very top edge: straight top
+   corners, rounded bottom corners. After a small scroll it lifts off the edge
+   and its top corners round off, so it becomes a floating rounded bar. The
+   drop and the rounding run on one 0.5s curve, so it reads as a single smooth
+   morph. */
 .dock {
   position: fixed;
   top: 0;
@@ -307,9 +303,8 @@ body::-webkit-scrollbar {
   max-width: 960px;
   margin: 0 auto;
   padding: 8px 8px 8px 16px;
-  will-change: width, transform;
+  will-change: transform;
   transition:
-    width 0.5s cubic-bezier(0.32, 0.72, 0, 1),
     transform 0.5s cubic-bezier(0.32, 0.72, 0, 1),
     border-radius 0.5s cubic-bezier(0.32, 0.72, 0, 1),
     background-color 0.4s ease,
@@ -327,8 +322,8 @@ body::-webkit-scrollbar {
   backdrop-filter: blur(14px) saturate(130%);
 }
 
-/* Collapsed: lifts off the edge, top corners round, glass firms up a little */
-.dock[data-collapsed="true"] .dock__bar {
+/* Scrolled: lifts off the edge, top corners round, glass firms up a little */
+.dock[data-scrolled="true"] .dock__bar {
   border-radius: 18px;
   transform: translateY(12px);
   border-color: rgba(255, 255, 255, 0.12);
@@ -381,13 +376,10 @@ body::-webkit-scrollbar {
   border-radius: 6px;
   font-size: 14px;
   color: rgba(255, 255, 255, 0.65);
-  transition:
-    color 0.15s ease,
-    padding 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: color 0.15s ease;
 }
 
-/* Icon sits on the left of the label and is always visible. When the dock
-   shrinks, the label (and its left margin) collapses and the icon stays. */
+/* Icon sits on the left of the label. */
 .dock__icon {
   flex: none;
   display: block;
@@ -417,13 +409,7 @@ body::-webkit-scrollbar {
   display: block;
   overflow: hidden;
   white-space: nowrap;
-  width: var(--tw, auto);
   margin-left: 8px;
-  opacity: 1;
-  transition:
-    width 0.5s cubic-bezier(0.32, 0.72, 0, 1),
-    margin-left 0.5s cubic-bezier(0.32, 0.72, 0, 1),
-    opacity 0.2s ease 0.1s;
 }
 
 .dock__text > span {
@@ -435,25 +421,6 @@ body::-webkit-scrollbar {
 .dock__link:focus-visible,
 .dock__link[aria-current="page"] {
   color: #fff;
-}
-
-/* Collapsed: bar shrinks, link text gives way to icons */
-.dock[data-collapsed="true"] .dock__bar {
-  width: var(--dock-collapsed-w, 260px);
-}
-
-.dock[data-collapsed="true"] .dock__link {
-  padding-inline: 8px;
-}
-
-.dock[data-collapsed="true"] .dock__text {
-  width: 0;
-  margin-left: 0;
-  opacity: 0;
-  transition:
-    width 0.5s cubic-bezier(0.32, 0.72, 0, 1),
-    margin-left 0.5s cubic-bezier(0.32, 0.72, 0, 1),
-    opacity 0.15s ease;
 }
 
 /* One shared highlight that glides between links */
@@ -707,7 +674,6 @@ button.dock__user {
   .dock__hl--slide,
   .dock__bar,
   .dock::before,
-  .dock__text,
   .dock__links {
     transition: none !important;
   }

@@ -8,7 +8,7 @@ import { authClient } from "../lib/auth-client";
 // TODO: swap for your real invite link.
 const DISCORD_URL = "https://discord.gg/";
 
-// Icons live in /public/icons/<icon>.png. They sit left of the label and stay put when the dock shrinks.
+// Icons live in /public/icons/<icon>.png. They sit left of the label and stay put as the bar lifts off the top edge.
 const links = [
   {
     href: "/leaderboard",
@@ -30,17 +30,10 @@ const links = [
   },
 ];
 
-// A link in icon form: 20px icon + 8px padding each side. Gap between links: 4px.
-const ICON_LINK_W = 36;
-const LINK_GAP = 4;
-
 export default function Dock() {
   const pathname = usePathname();
   const listRef = useRef<HTMLUListElement>(null);
-  const [collapsed, setCollapsed] = useState(false);
-  const headerRef = useRef<HTMLElement>(null);
-  const brandRef = useRef<HTMLAnchorElement>(null);
-  const btnRef = useRef<HTMLAnchorElement>(null);
+  const [scrolled, setScrolled] = useState(false);
   const userRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
@@ -97,8 +90,8 @@ export default function Dock() {
     }
   }, []);
 
-  // Links change width while the dock shrinks/grows; keep the highlight glued
-  // to its link through that (no gliding, it just follows).
+  // Keep the highlight glued to its link if the link's size changes (font
+  // load, window resize). No gliding, it just follows.
   useEffect(() => {
     const list = listRef.current;
     if (!list || typeof ResizeObserver === "undefined") return;
@@ -113,66 +106,21 @@ export default function Dock() {
     rest();
   }, [pathname, rest]);
 
-  // Turn into the dock after a small scroll, and back into the wide bar once
-  // you're (nearly) at the top again. Two thresholds, so it can't flicker
+  // Lift off the top edge after a small scroll, and hang from it again once
+  // you're (nearly) at the top. Two thresholds, so it can't flicker
   // back and forth around a single scroll position.
   useEffect(() => {
     const onScroll = () =>
-      setCollapsed((was) => (was ? window.scrollY > 8 : window.scrollY > 32));
+      setScrolled((was) => (was ? window.scrollY > 8 : window.scrollY > 32));
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Widths can't animate to "auto", so measure what the collapsed bar needs
-  // and hand it to CSS as a variable. The icons are centered, so the bar has
-  // to leave room for them on both sides of the center.
-  useEffect(() => {
-    const measure = () => {
-      const brand = brandRef.current;
-      const btn = btnRef.current;
-      const list = listRef.current;
-      if (!brand || !btn || !list) return;
-      // Discord button + the account box next to it (8px gap between them)
-      const userW = userRef.current ? userRef.current.offsetWidth + 8 : 0;
-      const btnW = btn.offsetWidth + userW;
-
-      // Give each label its real width so the collapse animates over the exact
-      // distance (animating from a guessed max-width has a dead zone, which
-      // reads as the icons lurching at the end).
-      list.querySelectorAll<HTMLElement>(".dock__text").forEach((t) => {
-        const inner = t.firstElementChild as HTMLElement | null;
-        if (inner) t.style.setProperty("--tw", `${inner.getBoundingClientRect().width}px`);
-      });
-
-      const gap = 20;
-      const linksShown = getComputedStyle(list).display !== "none";
-      let w: number;
-      if (linksShown) {
-        const icons = links.length * ICON_LINK_W + (links.length - 1) * LINK_GAP;
-        const left = 2 * (brand.offsetWidth + gap + 16) + icons; // 16px left padding
-        const right = 2 * (btnW + gap + 9) + icons; // 8px padding + 1px border
-        w = Math.max(left, right);
-      } else {
-        w = brand.offsetWidth + btnW + 16 + 8 + 2 + 24;
-      }
-      headerRef.current?.style.setProperty("--dock-collapsed-w", `${w}px`);
-    };
-    measure();
-    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
-    if (userRef.current) ro?.observe(userRef.current);
-    window.addEventListener("resize", measure);
-    document.fonts?.ready.then(measure);
-    return () => {
-      ro?.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, []);
-
   return (
-    <header className="dock" data-collapsed={collapsed} ref={headerRef}>
+    <header className="dock" data-scrolled={scrolled}>
       <nav className="dock__bar" aria-label="Main">
-        <Link href="/" className="dock__brand" ref={brandRef}>
+        <Link href="/" className="dock__brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="dock__brand-icon" src="/dock.png" alt="" width={26} height={26} />
           raided.cc
@@ -230,7 +178,6 @@ export default function Dock() {
         <a
           href={DISCORD_URL}
           className="dock__discord"
-          ref={btnRef}
           target="_blank"
           rel="noopener noreferrer"
         >
