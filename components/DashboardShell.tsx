@@ -204,6 +204,9 @@ export default function DashboardShell({
         {section === "description" && null}
         {section === "misc" && <MiscPanel pet={pet} onPet={setPet} />}
         {section === "sections" && null}
+        {section === "widgets" && null}
+        {section === "projects" && null}
+        {section === "links" && null}
       </main>
     </>
   );
