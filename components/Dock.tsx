@@ -122,7 +122,7 @@ export default function Dock() {
       <nav className="dock__bar" aria-label="Main">
         <Link href="/" className="dock__brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="dock__brand-icon" src="/dock.png" alt="" width={26} height={26} />
+          <img className="dock__brand-icon" src="/dock.png" alt="" width={20} height={20} />
           raided.cc
         </Link>
 
@@ -164,8 +164,8 @@ export default function Dock() {
                   className={`dock__icon ${iconClass}`}
                   src={icon}
                   alt=""
-                  width={20}
-                  height={20}
+                  width={16}
+                  height={16}
                 />
                 <span className="dock__text">
                   <span>{label}</span>
@@ -185,8 +185,8 @@ export default function Dock() {
             role="img"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
+            width="15"
+            height="15"
             fill="currentColor"
             aria-hidden="true"
           >
@@ -215,7 +215,7 @@ export default function Dock() {
                   )}
                 </span>
                 <span className="dock__username">{shownName}</span>
-                <svg className="dock__chevron" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true">
+                <svg className="dock__chevron" viewBox="0 0 10 6" width="8" height="5" aria-hidden="true">
                   <path d="M0 0h10L5 6z" fill="currentColor" />
                 </svg>
               </button>
