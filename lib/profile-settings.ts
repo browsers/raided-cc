@@ -197,7 +197,7 @@ export type PetSettings = {
 export const DEFAULT_PET: PetSettings = {
   enabled: false,
   size: 125,
-  speed: 100,
+  speed: 35,
   distance: 10,
   color: "#ffffff",
   opacity: 100,

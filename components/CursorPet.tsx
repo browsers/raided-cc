@@ -14,7 +14,8 @@ import type { PetSettings } from "../lib/profile-settings";
 const SHEET_URL = "/pet/frames.png";
 const CELL = 32; // canvas is one 32x32 cell; the sprite is centred in it
 const BASE_SPEED = 225; // px per second at speed 100%
-const RUN_FRAME_MS = 50; // how long each of the two running frames shows
+const STRIDE_PX = 15; // ground covered per leg swap at 100% size, so legs match the speed
+const MIN_RUN_FRAME_MS = 90; // legs never flip faster than this, even at top speed
 const STILL_MS = 2000; // standing still before it sits down
 const SIT_MS = 200; // the single "sitting down" frame
 const BREATHE_MS = 200; // breathing loop, one frame every 200ms
@@ -127,6 +128,7 @@ export default function CursorPet({
     let dir = 0;
     let runFrame = 0;
     let lastRunSwap = 0;
+    let travel = 0; // px run since the last leg swap
     let idleSince = 0; // 0 = currently running
     let lastKey = "";
     let lastPx = 0;
@@ -163,6 +165,7 @@ export default function CursorPet({
         const step = Math.min(BASE_SPEED * (s.speed / 100) * dt, dist - s.distance);
         pos.x += (dx / dist) * step;
         pos.y += (dy / dist) * step;
+        travel += step;
         dir = ((Math.round(Math.atan2(dy, dx) / (Math.PI / 4)) % 8) + 8) % 8;
       }
 
@@ -171,9 +174,11 @@ export default function CursorPet({
       let key: string;
       if (running) {
         idleSince = 0;
-        if (ts - lastRunSwap >= RUN_FRAME_MS) {
+        // Swap legs once per stride, so a slow cat has slow legs
+        if (travel >= STRIDE_PX * (s.size / 100) && ts - lastRunSwap >= MIN_RUN_FRAME_MS) {
           runFrame ^= 1;
           lastRunSwap = ts;
+          travel = 0;
         }
         f = RUN[dir][runFrame];
         key = `r${dir}${runFrame}`;
