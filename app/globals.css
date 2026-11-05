@@ -281,9 +281,9 @@ body::-webkit-scrollbar {
   outline-offset: 3px;
 }
 
-/* Glass-fade dock (top bar). A full-width strip of blurred glass that fades out
-   downwards (no box, no border), with the nav row sitting on top of it.
-   Scrolling past halfway shrinks the row into a compact glass pill instead. */
+/* Top bar -> dock. At the top of the page it is a wide, rounded glass bar
+   (inset from the edges, like heist.lol). After a small scroll it shrinks
+   into a compact floating dock: link labels fold away and only icons stay. */
 .dock {
   position: fixed;
   top: 0;
@@ -294,42 +294,6 @@ body::-webkit-scrollbar {
   pointer-events: none;
 }
 
-/* The fade: blur + dark tint, both masked so they melt away toward the bottom */
-.dock::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 104px;
-  z-index: -1;
-  pointer-events: none;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.28) 55%, rgba(0, 0, 0, 0));
-  -webkit-backdrop-filter: blur(14px) saturate(130%);
-  backdrop-filter: blur(14px) saturate(130%);
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    #000 0%,
-    #000 30%,
-    rgba(0, 0, 0, 0.7) 52%,
-    rgba(0, 0, 0, 0.3) 76%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    #000 0%,
-    #000 30%,
-    rgba(0, 0, 0, 0.7) 52%,
-    rgba(0, 0, 0, 0.3) 76%,
-    transparent 100%
-  );
-  transition: opacity 0.4s ease;
-}
-
-.dock[data-collapsed="true"]::before {
-  opacity: 0;
-}
-
 .dock__bar {
   position: relative;
   box-sizing: border-box;
@@ -337,34 +301,30 @@ body::-webkit-scrollbar {
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: 100%;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 6px 8px 6px 16px;
+  padding: 8px 8px 8px 16px;
   will-change: width;
   transition:
     width 0.5s cubic-bezier(0.32, 0.72, 0, 1),
     background-color 0.4s ease,
     border-color 0.4s ease,
     box-shadow 0.4s ease;
-  border-radius: 10px;
-  /* No box while it sits on the fade */
-  border: 1px solid transparent;
-  background: transparent;
+  border-radius: 14px;
+  /* Dark glass, same look expanded and collapsed (only the shadow and
+     opacity firm up when it becomes the dock) */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(12, 12, 12, 0.55);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  backdrop-filter: blur(14px) saturate(130%);
 }
 
-/* Collapsed: the compact pill gets the flat glass look back */
+/* Collapsed: the dock firms up a little */
 .dock[data-collapsed="true"] .dock__bar {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.1); /* fallback if blur is unsupported */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-  .dock[data-collapsed="true"] .dock__bar {
-    background: rgba(255, 255, 255, 0.05);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-  }
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(12, 12, 12, 0.72);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.4);
 }
 
 .dock a {

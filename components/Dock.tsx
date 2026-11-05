@@ -113,10 +113,12 @@ export default function Dock() {
     rest();
   }, [pathname, rest]);
 
-  // Shrink the bar while on the second section or beyond (past halfway there),
-  // and grow back to full size on the first one.
+  // Turn into the dock after a small scroll, and back into the wide bar once
+  // you're (nearly) at the top again. Two thresholds, so it can't flicker
+  // back and forth around a single scroll position.
   useEffect(() => {
-    const onScroll = () => setCollapsed(window.scrollY > window.innerHeight * 0.5);
+    const onScroll = () =>
+      setCollapsed((was) => (was ? window.scrollY > 8 : window.scrollY > 32));
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
