@@ -5,6 +5,7 @@ import { countUniqueView } from "../../lib/views";
 import { backgroundFromKey } from "../../lib/r2";
 import {
   avatarFrom,
+  avatarBorderVars,
   avatarRadius,
   cardOpacityFrom,
   parseSettings,
@@ -12,6 +13,7 @@ import {
   tooltipVars,
 } from "../../lib/profile-settings";
 import ProfileBackdrop from "../../components/ProfileBackdrop";
+import "../avatar.css";
 import "../tooltip.css";
 import "./profile.css";
 
@@ -123,12 +125,14 @@ export default async function ProfilePage({
             {
               "--card-alpha": cardOpacity / 100,
               "--avatar-radius": avatarRadius(avatar),
+              ...avatarBorderVars(avatar),
               ...tooltipVars(tooltip),
             } as React.CSSProperties
           }
         >
           {/* Default pfp for now; uploads come later */}
-          <div className="profile__avatar">
+          <div className="profile__avatar pfp" data-pfp-border={avatar.borderStyle}>
+            <span className="pfp__inner">
             {user.image ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={user.image} alt="" draggable={false} />
@@ -136,6 +140,7 @@ export default async function ProfilePage({
               // eslint-disable-next-line @next/next/no-img-element
               <img className="profile__avatar-default" src="/icons/user.png" alt="" draggable={false} />
             )}
+            </span>
           </div>
 
           <h1 className="profile__name">

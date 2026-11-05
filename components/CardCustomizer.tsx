@@ -1,10 +1,13 @@
 "use client";
 
+import "../app/avatar.css";
 import "../app/tooltip.css";
 import {
   AVATAR_SHAPES,
+  BORDER_STYLES,
   TIP_ANIMATIONS,
   TIP_SHAPES,
+  avatarBorderVars,
   avatarRadius,
   tooltipVars,
   type AvatarSettings,
@@ -41,15 +44,19 @@ function Select<T extends string>({
 function SliderField({
   label,
   value,
+  min = 0,
   max = 100,
+  suffix = "%",
   onChange,
 }: {
   label: string;
   value: number;
+  min?: number;
   max?: number;
+  suffix?: string;
   onChange: (v: number) => void;
 }) {
-  const clamp = (n: number) => Math.min(max, Math.max(0, Math.round(Number.isFinite(n) ? n : 0)));
+  const clamp = (n: number) => Math.min(max, Math.max(min, Math.round(Number.isFinite(n) ? n : min)));
   return (
     <div className="field">
       <span className="field__label">{label}</span>
@@ -57,24 +64,24 @@ function SliderField({
         <input
           className="slider slider--fluid"
           type="range"
-          min={0}
+          min={min}
           max={max}
           step={1}
           value={value}
           onChange={(e) => onChange(clamp(Number(e.target.value)))}
-          style={{ "--fill": `${(value / max) * 100}%` } as React.CSSProperties}
+          style={{ "--fill": `${((value - min) / (max - min)) * 100}%` } as React.CSSProperties}
           aria-label={label}
         />
         <label className="numbox">
           <input
             type="number"
-            min={0}
+            min={min}
             max={max}
             value={value}
-            onChange={(e) => onChange(clamp(e.target.value === "" ? 0 : Number(e.target.value)))}
-            aria-label={`${label} percent`}
+            onChange={(e) => onChange(clamp(e.target.value === "" ? min : Number(e.target.value)))}
+            aria-label={`${label} (${suffix})`}
           />
-          <span>%</span>
+          <span>{suffix}</span>
         </label>
       </div>
     </div>
@@ -98,6 +105,17 @@ function ColorField({
         <span>{value.toUpperCase()}</span>
       </span>
     </label>
+  );
+}
+
+/** Content that slides open/closed smoothly; everything below it glides with it. */
+function Reveal({ open, children }: { open: boolean; children: React.ReactNode }) {
+  return (
+    <div className="reveal" data-open={open} aria-hidden={!open} inert={!open}>
+      <div className="reveal__inner">
+        <div className="reveal__content">{children}</div>
+      </div>
+    </div>
   );
 }
 
@@ -127,15 +145,21 @@ export default function CardCustomizer({
           <span className="setting__desc">The shape of your picture on your profile.</span>
         </div>
 
-        <div className="panel__preview">
-          <span className="aprev" style={{ borderRadius: avatarRadius(avatar) }}>
-            {image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={image} alt="" draggable={false} />
-            ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img className="aprev__default" src="/icons/user.png" alt="" draggable={false} />
-            )}
+        <div className="panel__preview panel__preview--stripes">
+          <span
+            className="aprev pfp"
+            data-pfp-border={avatar.borderStyle}
+            style={{ borderRadius: avatarRadius(avatar), ...avatarBorderVars(avatar) } as React.CSSProperties}
+          >
+            <span className="pfp__inner">
+              {image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={image} alt="" draggable={false} />
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img className="aprev__default" src="/icons/user.png" alt="" draggable={false} />
+              )}
+            </span>
           </span>
         </div>
 
@@ -147,16 +171,51 @@ export default function CardCustomizer({
             onChange={(shape) => onAvatar({ ...avatar, shape })}
           />
           {/* Roundness slider slides open only for "Custom" */}
-          <div className="reveal" data-open={avatar.shape === "custom"}>
-            <div className="reveal__inner">
+          <Reveal open={avatar.shape === "custom"}>
+            <SliderField
+              label="Corner roundness"
+              value={avatar.radius}
+              max={50}
+              onChange={(radius) => onAvatar({ ...avatar, radius })}
+            />
+          </Reveal>
+
+          <Select
+            label="Profile border"
+            value={avatar.borderStyle}
+            options={BORDER_STYLES}
+            onChange={(borderStyle) => onAvatar({ ...avatar, borderStyle })}
+          />
+          {/* Border options slide open for Color / Glass / Gradient */}
+          <Reveal open={avatar.borderStyle !== "none"}>
+            <div className="stack">
+              <ColorField
+                label={avatar.borderStyle === "glass" ? "Tint color" : "Color"}
+                value={avatar.borderColor}
+                onChange={(borderColor) => onAvatar({ ...avatar, borderColor })}
+              />
+              <Reveal open={avatar.borderStyle === "gradient"}>
+                <ColorField
+                  label="Second color"
+                  value={avatar.borderColor2}
+                  onChange={(borderColor2) => onAvatar({ ...avatar, borderColor2 })}
+                />
+              </Reveal>
               <SliderField
-                label="Corner roundness"
-                value={avatar.radius}
-                max={50}
-                onChange={(radius) => onAvatar({ ...avatar, radius })}
+                label="Opacity"
+                value={avatar.borderOpacity}
+                onChange={(borderOpacity) => onAvatar({ ...avatar, borderOpacity })}
+              />
+              <SliderField
+                label="Width"
+                value={avatar.borderWidth}
+                min={1}
+                max={12}
+                suffix="px"
+                onChange={(borderWidth) => onAvatar({ ...avatar, borderWidth })}
               />
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 

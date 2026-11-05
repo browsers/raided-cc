@@ -39,19 +39,47 @@ export const AVATAR_SHAPES = [
 ] as const;
 export type AvatarShape = (typeof AVATAR_SHAPES)[number]["value"];
 
+export const BORDER_STYLES = [
+  { value: "none", label: "None" },
+  { value: "color", label: "Color" },
+  { value: "glass", label: "Glass (blur)" },
+  { value: "gradient", label: "Gradient (moving)" },
+] as const;
+export type BorderStyle = (typeof BORDER_STYLES)[number]["value"];
+
 export type AvatarSettings = {
   shape: AvatarShape;
   /** Custom corner roundness: 0 = square, 50 = circle (percent of the picture) */
   radius: number;
+  borderStyle: BorderStyle;
+  borderColor: string;
+  /** Second colour, only used by the moving gradient */
+  borderColor2: string;
+  borderOpacity: number; // 0-100
+  borderWidth: number; // px, 1-12
 };
 
-export const DEFAULT_AVATAR: AvatarSettings = { shape: "rounded", radius: 12 };
+export const DEFAULT_AVATAR: AvatarSettings = {
+  shape: "rounded",
+  radius: 12,
+  borderStyle: "none",
+  borderColor: "#ffffff",
+  borderColor2: "#7c5cff",
+  borderOpacity: 100,
+  borderWidth: 3,
+};
 
 export function sanitizeAvatar(v: unknown): AvatarSettings {
   const o = isObj(v) ? v : {};
+  const d = DEFAULT_AVATAR;
   return {
-    shape: pick(o.shape, AVATAR_SHAPES.map((s) => s.value), DEFAULT_AVATAR.shape),
-    radius: clamp(o.radius, 0, 50, DEFAULT_AVATAR.radius),
+    shape: pick(o.shape, AVATAR_SHAPES.map((s) => s.value), d.shape),
+    radius: clamp(o.radius, 0, 50, d.radius),
+    borderStyle: pick(o.borderStyle, BORDER_STYLES.map((s) => s.value), d.borderStyle),
+    borderColor: color(o.borderColor, d.borderColor),
+    borderColor2: color(o.borderColor2, d.borderColor2),
+    borderOpacity: clamp(o.borderOpacity, 0, 100, d.borderOpacity),
+    borderWidth: clamp(o.borderWidth, 1, 12, d.borderWidth),
   };
 }
 
@@ -61,6 +89,22 @@ export function avatarRadius(a: AvatarSettings): string {
   if (a.shape === "circle") return "50%";
   if (a.shape === "custom") return `${a.radius}%`;
   return "14px";
+}
+
+/** CSS variables app/avatar.css reads to draw the border ring around the picture. */
+export function avatarBorderVars(a: AvatarSettings): Record<string, string> {
+  const w = a.borderStyle === "none" ? 0 : a.borderWidth;
+  const inner =
+    a.shape === "circle" ? "50%" : a.shape === "custom" ? `${a.radius}%` : `${Math.max(0, 14 - w)}px`;
+  const vars: Record<string, string> = { "--pfp-bw": `${w}px`, "--avatar-inner-radius": inner };
+  if (a.borderStyle === "color") vars["--pfp-bg"] = hexToRgba(a.borderColor, a.borderOpacity);
+  // Glass is a frosted tint, so the same opacity slider gives a softer range
+  if (a.borderStyle === "glass") vars["--pfp-bg"] = hexToRgba(a.borderColor, Math.round(a.borderOpacity * 0.35));
+  if (a.borderStyle === "gradient") {
+    vars["--pfp-c1"] = hexToRgba(a.borderColor, a.borderOpacity);
+    vars["--pfp-c2"] = hexToRgba(a.borderColor2, a.borderOpacity);
+  }
+  return vars;
 }
 
 // ---------- Tooltips (the hover bubbles on the name and view count) ----------

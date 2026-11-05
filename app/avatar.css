@@ -1,0 +1,48 @@
+/* Profile picture border ring. Shared by the public profile and the dashboard
+   preview. The outer element has class "pfp" and data-pfp-border; the CSS
+   variables come from avatarBorderVars() in lib/profile-settings.ts. */
+.pfp {
+  box-sizing: border-box;
+  padding: var(--pfp-bw, 0px);
+}
+
+.pfp__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--avatar-inner-radius, 14px);
+}
+
+.pfp[data-pfp-border="color"] {
+  background: var(--pfp-bg);
+}
+
+/* Frosted glass: translucent tint that blurs whatever is behind it */
+.pfp[data-pfp-border="glass"] {
+  background: var(--pfp-bg);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+/* Moving gradient: colour 1 > colour 2 > colour 1 slides across, looping seamlessly */
+.pfp[data-pfp-border="gradient"] {
+  background: linear-gradient(120deg, var(--pfp-c1), var(--pfp-c2), var(--pfp-c1));
+  background-size: 200% 200%;
+  animation: pfp-flow 4s linear infinite;
+}
+
+@keyframes pfp-flow {
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pfp[data-pfp-border="gradient"] {
+    animation: none;
+  }
+}

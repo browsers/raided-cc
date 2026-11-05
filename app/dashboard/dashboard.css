@@ -725,7 +725,22 @@
 .panel__fields {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+}
+
+/* Spacing between fields. Reveal blocks carry their own top padding, so a
+   collapsed one adds no extra gap. */
+.panel__fields > * + *,
+.stack > * + * {
+  margin-top: 14px;
+}
+.panel__fields > .reveal,
+.stack > .reveal {
+  margin-top: 0;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
 }
 
 .field {
@@ -843,12 +858,15 @@
   border-radius: 3px;
 }
 
-/* Custom-roundness slider slides open/closed */
+/* Slides open/closed: height eases, content drops down and fades in, and
+   everything below glides with it */
 .reveal {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 0.2s ease, opacity 0.2s ease;
   opacity: 0;
+  transition:
+    grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.25s ease;
 }
 .reveal[data-open="true"] {
   grid-template-rows: 1fr;
@@ -858,8 +876,21 @@
   min-height: 0;
   overflow: hidden;
 }
+.reveal__content {
+  padding-top: 14px;
+  transform: translateY(-14px);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.reveal[data-open="true"] .reveal__content {
+  transform: translateY(0);
+}
 
 /* Profile picture preview */
+/* faint stripes behind the picture so the glass blur is visible */
+.panel__preview--stripes {
+  background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05) 0 12px, transparent 12px 24px);
+}
+
 .aprev {
   display: inline-flex;
   align-items: center;

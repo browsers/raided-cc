@@ -33,15 +33,17 @@
     transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* little pointer under the bubble: only the outside (triangle) half is drawn */
+/* Pointer under the bubble. A rotated square, clipped to its lower triangle so
+   only the outside half shows. Its centre sits on the bubble's bottom border,
+   so it joins the bubble with no gap. */
 .tip::after {
   content: "";
   position: absolute;
   left: 50%;
   bottom: -5px;
-  width: 8px;
-  height: 8px;
-  background: var(--tip-bg, rgba(22, 22, 22, 0.95));
+  width: 10px;
+  height: 10px;
+  background: var(--tip-bg, rgba(22, 22, 22, 0.82));
   border-right: 1px solid var(--tip-border, rgba(255, 255, 255, 0.12));
   border-bottom: 1px solid var(--tip-border, rgba(255, 255, 255, 0.12));
   clip-path: polygon(100% 0, 100% 100%, 0 100%);
