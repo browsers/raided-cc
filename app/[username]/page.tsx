@@ -9,10 +9,12 @@ import {
   avatarRadius,
   cardOpacityFrom,
   parseSettings,
+  petFrom,
   tooltipFrom,
   tooltipVars,
 } from "../../lib/profile-settings";
 import ProfileBackdrop from "../../components/ProfileBackdrop";
+import CursorPet from "../../components/CursorPet";
 import "../avatar.css";
 import "../tooltip.css";
 import "./profile.css";
@@ -77,6 +79,7 @@ async function getLook(userId: string) {
       cardOpacity: cardOpacityFrom(settings),
       avatar: avatarFrom(settings),
       tooltip: tooltipFrom(settings),
+      pet: petFrom(settings),
     };
   } catch {
     const settings = {};
@@ -85,6 +88,7 @@ async function getLook(userId: string) {
       cardOpacity: 100,
       avatar: avatarFrom(settings),
       tooltip: tooltipFrom(settings),
+      pet: petFrom(settings),
     };
   }
 }
@@ -111,7 +115,7 @@ export default async function ProfilePage({
 
   const views = await countUniqueView(user.id);
   const uid = await getUid(user.id);
-  const { background, cardOpacity, avatar, tooltip } = await getLook(user.id);
+  const { background, cardOpacity, avatar, tooltip, pet } = await getLook(user.id);
   const name = user.displayUsername || user.username;
 
   return (
@@ -178,6 +182,7 @@ export default async function ProfilePage({
           )}
         </main>
       </div>
+      {pet.enabled && <CursorPet settings={pet} scope="page" />}
     </div>
   );
 }

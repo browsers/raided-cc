@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { authClient } from "../lib/auth-client";
 import AssetsPanel from "./AssetsPanel";
+import MiscPanel from "./MiscPanel";
 import type { Background } from "../lib/r2";
-import type { AvatarSettings, TooltipSettings } from "../lib/profile-settings";
+import type { AvatarSettings, PetSettings, TooltipSettings } from "../lib/profile-settings";
 import DashboardNav, { type Section } from "./DashboardNav";
 
 export default function DashboardShell({
@@ -16,6 +17,7 @@ export default function DashboardShell({
   cardOpacity: initialCardOpacity,
   avatarLayout: initialAvatarLayout,
   tooltip: initialTooltip,
+  pet: initialPet,
 }: {
   username: string;
   displayName: string;
@@ -25,6 +27,7 @@ export default function DashboardShell({
   cardOpacity: number;
   avatarLayout: AvatarSettings;
   tooltip: TooltipSettings;
+  pet: PetSettings;
 }) {
   const [section, setSection] = useState<Section>("overview");
   const [image, setImage] = useState<string | null>(initialImage);
@@ -32,6 +35,7 @@ export default function DashboardShell({
   const [cardOpacity, setCardOpacity] = useState(initialCardOpacity);
   const [avatarLayout, setAvatarLayout] = useState(initialAvatarLayout);
   const [tooltip, setTooltip] = useState(initialTooltip);
+  const [pet, setPet] = useState(initialPet);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -198,6 +202,7 @@ export default function DashboardShell({
           />
         )}
         {section === "description" && null}
+        {section === "misc" && <MiscPanel pet={pet} onPet={setPet} />}
       </main>
     </>
   );

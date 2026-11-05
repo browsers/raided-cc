@@ -177,3 +177,51 @@ export function tooltipVars(t: TooltipSettings): Record<string, string> {
     "--tip-radius": TIP_RADIUS[t.shape],
   };
 }
+
+// ---------- Cursor pet (the little sprite that chases the visitor's mouse) ----------
+
+export type PetSettings = {
+  /** Show the pet on the public profile */
+  enabled: boolean;
+  /** Sprite size, percent of the 32px original (125 = 40px) */
+  size: number;
+  /** Running speed, percent of the original */
+  speed: number;
+  /** How close it gets to the cursor before it stops, in px */
+  distance: number;
+  /** Tint for the white part of the sprite; the black outline stays */
+  color: string;
+  opacity: number; // 10-100
+};
+
+export const DEFAULT_PET: PetSettings = {
+  enabled: false,
+  size: 125,
+  speed: 100,
+  distance: 10,
+  color: "#ffffff",
+  opacity: 100,
+};
+
+export const PET_LIMITS = {
+  size: { min: 50, max: 300 },
+  speed: { min: 25, max: 250 },
+  distance: { min: 0, max: 200 },
+  opacity: { min: 10, max: 100 },
+} as const;
+
+export function sanitizePet(v: unknown): PetSettings {
+  const o = isObj(v) ? v : {};
+  const d = DEFAULT_PET;
+  const L = PET_LIMITS;
+  return {
+    enabled: o.enabled === true,
+    size: clamp(o.size, L.size.min, L.size.max, d.size),
+    speed: clamp(o.speed, L.speed.min, L.speed.max, d.speed),
+    distance: clamp(o.distance, L.distance.min, L.distance.max, d.distance),
+    color: color(o.color, d.color),
+    opacity: clamp(o.opacity, L.opacity.min, L.opacity.max, d.opacity),
+  };
+}
+
+export const petFrom = (settings: Record<string, unknown>) => sanitizePet(settings.pet);

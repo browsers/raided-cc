@@ -5,13 +5,14 @@ import {
   cardOpacityFrom,
   parseSettings,
   sanitizeAvatar,
+  sanitizePet,
   sanitizeTooltip,
 } from "../../../lib/profile-settings";
 
 export const dynamic = "force-dynamic";
 
 // Saves card settings into profiles.settings. Send any of:
-//   { opacity, avatar, tooltip }
+//   { opacity, avatar, tooltip, pet }
 // Each value is checked and cleaned here, so the browser can't store junk.
 export async function POST(req: Request) {
   const session = await getAuth().api.getSession({ headers: req.headers });
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
 
-  let body: { opacity?: unknown; avatar?: unknown; tooltip?: unknown };
+  let body: { opacity?: unknown; avatar?: unknown; tooltip?: unknown; pet?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -36,6 +37,7 @@ export async function POST(req: Request) {
   }
   if (body.avatar !== undefined) patch.avatar = sanitizeAvatar(body.avatar);
   if (body.tooltip !== undefined) patch.tooltip = sanitizeTooltip(body.tooltip);
+  if (body.pet !== undefined) patch.pet = sanitizePet(body.pet);
   if (Object.keys(patch).length === 0) {
     return NextResponse.json({ error: "Nothing to save." }, { status: 400 });
   }
