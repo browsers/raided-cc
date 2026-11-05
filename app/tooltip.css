@@ -82,9 +82,9 @@
   width: 16px;
   height: 8px;
   transform: translateX(-50%);
+  /* No backdrop-filter here: browsers don't clip it to the triangle, which
+     showed up as a dark rectangle behind the pointer. */
   background: var(--tip-bg, rgba(22, 22, 22, 0.82));
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  backdrop-filter: blur(14px) saturate(140%);
   clip-path: polygon(0 0, 100% 0, 50% 100%);
 }
 
