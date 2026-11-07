@@ -65,6 +65,9 @@ const PETS: Record<PetType, PetSheet> = {
   },
 };
 
+/** Unknown or missing type (old saved settings, mismatched files) -> the cat. */
+const petType = (t: unknown): PetType => (typeof t === "string" && t in PETS ? (t as PetType) : "cat");
+
 const images = new Map<PetType, HTMLImageElement>();
 /** Loads a sheet once and remembers it; returns it only when it's ready. */
 function sheetImage(type: PetType): HTMLImageElement | null {
@@ -177,12 +180,13 @@ export default function CursorPet({
       const s = settingsRef.current;
 
       // (Re)build the tinted sheet when the colour or the pet changes
-      if (builtColor !== s.color || builtType !== s.type) {
-        const base = sheetImage(s.type);
+      const wanted = petType(s.type);
+      if (builtColor !== s.color || builtType !== wanted) {
+        const base = sheetImage(wanted);
         if (base) {
           sheet = tint(base, s.color);
           builtColor = s.color;
-          builtType = s.type;
+          builtType = wanted;
           lastKey = "";
         }
       }
