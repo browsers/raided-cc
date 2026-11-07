@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { DEFAULT_PET, PET_LIMITS, PET_TYPES, type PetSettings } from "../lib/profile-settings";
+import {
+  DEFAULT_PET,
+  PET_LIMITS,
+  PET_TYPES,
+  type PetSettings,
+  type PetType,
+} from "../lib/profile-settings";
 import CursorPet from "./CursorPet";
 import "./MiscPanel.css";
 
@@ -179,24 +185,20 @@ export default function MiscPanel({
               <span className="setting__desc">Changes show in the preview right away.</span>
             </div>
             <div className="panel__fields">
-              <div className="field">
+              <label className="field">
                 <span className="field__label">Pet</span>
-                <div className="pet-pick" role="radiogroup" aria-label="Pet">
+                <select
+                  className="select"
+                  value={pet.type}
+                  onChange={(e) => update({ type: e.target.value as PetType })}
+                >
                   {PET_TYPES.map((t) => (
-                    <button
-                      key={t}
-                      type="button"
-                      role="radio"
-                      aria-checked={pet.type === t}
-                      className="pet-pick__btn"
-                      data-on={pet.type === t}
-                      onClick={() => update({ type: t })}
-                    >
+                    <option key={t} value={t}>
                       {t.charAt(0).toUpperCase() + t.slice(1)}
-                    </button>
+                    </option>
                   ))}
-                </div>
-              </div>
+                </select>
+              </label>
               <PetSlider
                 label="Size"
                 value={pet.size}
