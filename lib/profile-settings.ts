@@ -180,8 +180,8 @@ export function tooltipVars(t: TooltipSettings): Record<string, string> {
 
 // ---------- Cursor pet (the little sprite that chases the visitor's mouse) ----------
 
-/** Which pet. To add one: drop its sheet in public/pet/, add it to PETS in
- *  components/CursorPet.tsx, and add its id here. */
+/** Which pet. The cat is a sprite sheet (public/pet/frames.png); the snake is
+ *  drawn live in components/snake.ts so it can be any length. */
 export const PET_TYPES = ["cat", "snake"] as const;
 export type PetType = (typeof PET_TYPES)[number];
 
@@ -192,6 +192,8 @@ export type PetSettings = {
   type: PetType;
   /** Sprite size, percent of the 32px original (125 = 40px) */
   size: number;
+  /** Snake only: body length in sprite pixels */
+  length: number;
   /** Running speed, percent of the original */
   speed: number;
   /** How close it gets to the cursor before it stops, in px */
@@ -205,6 +207,7 @@ export const DEFAULT_PET: PetSettings = {
   enabled: false,
   type: "cat",
   size: 125,
+  length: 60,
   speed: 35,
   distance: 10,
   color: "#ffffff",
@@ -213,6 +216,7 @@ export const DEFAULT_PET: PetSettings = {
 
 export const PET_LIMITS = {
   size: { min: 50, max: 300 },
+  length: { min: 20, max: 150 },
   speed: { min: 25, max: 250 },
   distance: { min: 0, max: 200 },
   opacity: { min: 10, max: 100 },
@@ -226,6 +230,7 @@ export function sanitizePet(v: unknown): PetSettings {
     enabled: o.enabled === true,
     type: PET_TYPES.find((t) => t === o.type) ?? d.type,
     size: clamp(o.size, L.size.min, L.size.max, d.size),
+    length: clamp(o.length, L.length.min, L.length.max, d.length),
     speed: clamp(o.speed, L.speed.min, L.speed.max, d.speed),
     distance: clamp(o.distance, L.distance.min, L.distance.max, d.distance),
     color: color(o.color, d.color),

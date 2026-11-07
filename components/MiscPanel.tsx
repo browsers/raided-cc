@@ -205,6 +205,16 @@ export default function MiscPanel({
                 suffix="%"
                 onChange={(size) => update({ size })}
               />
+              {pet.type === "snake" && (
+                <PetSlider
+                  label="Length"
+                  value={pet.length}
+                  min={L.length.min}
+                  max={L.length.max}
+                  suffix="px"
+                  onChange={(length) => update({ length })}
+                />
+              )}
               <PetSlider
                 label="Speed"
                 value={pet.speed}
