@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { DEFAULT_PET, PET_LIMITS, type PetSettings } from "../lib/profile-settings";
+import { DEFAULT_PET, PET_LIMITS, PET_TYPES, type PetSettings } from "../lib/profile-settings";
 import CursorPet from "./CursorPet";
 import "./MiscPanel.css";
 
@@ -141,7 +141,7 @@ export default function MiscPanel({
           <div className="setting__text">
             <span className="setting__name">Show on my profile</span>
             <span className="setting__desc">
-              A pixel cat that chases your visitors&apos; cursor around your page. It only shows on
+              A pixel pet that chases your visitors&apos; cursor around your page. It only shows on
               devices with a mouse.
             </span>
           </div>
@@ -179,6 +179,24 @@ export default function MiscPanel({
               <span className="setting__desc">Changes show in the preview right away.</span>
             </div>
             <div className="panel__fields">
+              <div className="field">
+                <span className="field__label">Pet</span>
+                <div className="pet-pick" role="radiogroup" aria-label="Pet">
+                  {PET_TYPES.map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      role="radio"
+                      aria-checked={pet.type === t}
+                      className="pet-pick__btn"
+                      data-on={pet.type === t}
+                      onClick={() => update({ type: t })}
+                    >
+                      {t.charAt(0).toUpperCase() + t.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <PetSlider
                 label="Size"
                 value={pet.size}
@@ -215,7 +233,7 @@ export default function MiscPanel({
               <button
                 type="button"
                 className="pet-reset"
-                onClick={() => update({ ...DEFAULT_PET, enabled: pet.enabled })}
+                onClick={() => update({ ...DEFAULT_PET, enabled: pet.enabled, type: pet.type })}
               >
                 Reset look
               </button>

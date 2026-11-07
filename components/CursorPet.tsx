@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { PetSettings } from "../lib/profile-settings";
+import type { PetSettings, PetType } from "../lib/profile-settings";
 
-// A pixel cat that runs after the cursor and sits down when it catches up.
-// The sprite sheet is /public/pet/frames.png (256x128, 32px cells).
+// A pixel pet (cat or snake) that runs after the cursor and settles down when
+// it catches up. Sprite sheets are in /public/pet/ (256x128, 32px cells).
 //
 //   scope="page"  fixed to the viewport, follows the cursor anywhere
 //   scope="box"   lives inside its parent (which needs position: relative and
@@ -23,20 +23,59 @@ const BREATHE_MS = 200; // breathing loop, one frame every 200ms
 type Frame = { x: number; y: number; w: number; h: number };
 const frame = (x: number, y: number, w = 32, h = 32): Frame => ({ x, y, w, h });
 
-// Clockwise from "right", so index = round(angle / 45deg)
-const RUN: Frame[][] = [
-  [frame(95, 0, 32, 28), frame(96, 33, 32, 28)], // right
-  [frame(160, 33), frame(162, 62)], // down-right
-  [frame(193, 96), frame(224, 63)], // down
-  [frame(160, 96), frame(128, 96)], // down-left
-  [frame(129, 64, 32, 28), frame(128, 99, 32, 28)], // left
-  [frame(34, 0), frame(33, 30)], // up-left
-  [frame(32, 64), frame(32, 96)], // up
-  [frame(0, 64), frame(0, 96)], // up-right
-];
-const STILL = frame(96, 96);
-const SIT = frame(96, 63);
-const BREATHE = [frame(64, 0), frame(64, 32)];
+type PetSheet = {
+  url: string;
+  /** Two leg/wave frames per direction, clockwise from "right":
+   *  index = round(angle / 45deg) */
+  run: Frame[][];
+  still: Frame; // stopped, before it settles
+  sit: Frame; // the single "settling down" frame
+  breathe: Frame[]; // two-frame idle loop
+};
+
+// A clean 32px grid, used by the snake sheet
+const cell = (col: number, row: number) => frame(col * 32, row * 32);
+
+// To add a pet: draw a sheet, add it here, and add its id to PET_TYPES in
+// lib/profile-settings.ts. The tint, size and speed controls work on any of them.
+const PETS: Record<PetType, PetSheet> = {
+  cat: {
+    url: "/pet/frames.png",
+    run: [
+      [frame(95, 0, 32, 28), frame(96, 33, 32, 28)], // right
+      [frame(160, 33), frame(162, 62)], // down-right
+      [frame(193, 96), frame(224, 63)], // down
+      [frame(160, 96), frame(128, 96)], // down-left
+      [frame(129, 64, 32, 28), frame(128, 99, 32, 28)], // left
+      [frame(34, 0), frame(33, 30)], // up-left
+      [frame(32, 64), frame(32, 96)], // up
+      [frame(0, 64), frame(0, 96)], // up-right
+    ],
+    still: frame(96, 96),
+    sit: frame(96, 63),
+    breathe: [frame(64, 0), frame(64, 32)],
+  },
+  // Drawn by scripts/make-snake-sprites.py: row 0/1 = run frames, row 2 = idle
+  snake: {
+    url: "/pet/snake.png",
+    run: Array.from({ length: 8 }, (_, d) => [cell(d, 0), cell(d, 1)]),
+    still: cell(0, 2),
+    sit: cell(1, 2),
+    breathe: [cell(2, 2), cell(3, 2)],
+  },
+};
+
+const images = new Map<PetType, HTMLImageElement>();
+/** Loads a sheet once and remembers it; returns it only when it's ready. */
+function sheetImage(type: PetType): HTMLImageElement | null {
+  let img = images.get(type);
+  if (!img) {
+    img = new Image();
+    img.src = PETS[type].url;
+    images.set(type, img);
+  }
+  return img.complete && img.naturalWidth > 0 ? img : null;
+}
 
 /** Recolours the white part of the sprite. The black outline is kept. */
 function tint(img: HTMLImageElement, color: string): HTMLCanvasElement {
@@ -115,15 +154,10 @@ export default function CursorPet({
     source.addEventListener("pointermove", onMove as EventListener);
     if (host) host.addEventListener("pointerleave", onLeave);
 
-    // Sprite sheet, loaded once; `sheet` is the tinted copy we draw from
-    let base: HTMLImageElement | null = null;
+    // `sheet` is the tinted copy of the current pet's sprite sheet we draw from
     let sheet: HTMLCanvasElement | null = null;
     let builtColor = "";
-    const img = new Image();
-    img.onload = () => {
-      base = img;
-    };
-    img.src = SHEET_URL;
+    let builtType: PetType | "" = "";
 
     let dir = 0;
     let runFrame = 0;
@@ -142,13 +176,18 @@ export default function CursorPet({
       last = ts;
       const s = settingsRef.current;
 
-      // (Re)build the tinted sheet when the colour changes
-      if (base && builtColor !== s.color) {
-        sheet = tint(base, s.color);
-        builtColor = s.color;
-        lastKey = "";
+      // (Re)build the tinted sheet when the colour or the pet changes
+      if (builtColor !== s.color || builtType !== s.type) {
+        const base = sheetImage(s.type);
+        if (base) {
+          sheet = tint(base, s.color);
+          builtColor = s.color;
+          builtType = s.type;
+          lastKey = "";
+        }
       }
       if (!sheet) return;
+      const pet = PETS[builtType as PetType];
 
       // In the preview, wander back to the middle when the pointer leaves
       if (host && !hovering) {
@@ -180,14 +219,14 @@ export default function CursorPet({
           lastRunSwap = ts;
           travel = 0;
         }
-        f = RUN[dir][runFrame];
+        f = pet.run[dir][runFrame];
         key = `r${dir}${runFrame}`;
       } else {
         if (!idleSince) idleSince = ts;
         const t = ts - idleSince;
-        if (t < STILL_MS) f = STILL;
-        else if (t < STILL_MS + SIT_MS) f = SIT;
-        else f = BREATHE[Math.floor((t - STILL_MS - SIT_MS) / BREATHE_MS) % 2];
+        if (t < STILL_MS) f = pet.still;
+        else if (t < STILL_MS + SIT_MS) f = pet.sit;
+        else f = pet.breathe[Math.floor((t - STILL_MS - SIT_MS) / BREATHE_MS) % 2];
         key = `i${f.x},${f.y}`;
       }
 
@@ -220,7 +259,6 @@ export default function CursorPet({
       cancelAnimationFrame(raf);
       source.removeEventListener("pointermove", onMove as EventListener);
       if (host) host.removeEventListener("pointerleave", onLeave);
-      img.onload = null;
     };
   }, [scope]);
 

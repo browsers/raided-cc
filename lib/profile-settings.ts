@@ -180,9 +180,16 @@ export function tooltipVars(t: TooltipSettings): Record<string, string> {
 
 // ---------- Cursor pet (the little sprite that chases the visitor's mouse) ----------
 
+/** Which pet. To add one: drop its sheet in public/pet/, add it to PETS in
+ *  components/CursorPet.tsx, and add its id here. */
+export const PET_TYPES = ["cat", "snake"] as const;
+export type PetType = (typeof PET_TYPES)[number];
+
 export type PetSettings = {
   /** Show the pet on the public profile */
   enabled: boolean;
+  /** Which sprite sheet to use */
+  type: PetType;
   /** Sprite size, percent of the 32px original (125 = 40px) */
   size: number;
   /** Running speed, percent of the original */
@@ -196,6 +203,7 @@ export type PetSettings = {
 
 export const DEFAULT_PET: PetSettings = {
   enabled: false,
+  type: "cat",
   size: 125,
   speed: 35,
   distance: 10,
@@ -216,6 +224,7 @@ export function sanitizePet(v: unknown): PetSettings {
   const L = PET_LIMITS;
   return {
     enabled: o.enabled === true,
+    type: PET_TYPES.find((t) => t === o.type) ?? d.type,
     size: clamp(o.size, L.size.min, L.size.max, d.size),
     speed: clamp(o.speed, L.speed.min, L.speed.max, d.speed),
     distance: clamp(o.distance, L.distance.min, L.distance.max, d.distance),
