@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { PetSettings } from "../lib/profile-settings";
+import type { PetSettings, PetType } from "../lib/profile-settings";
 import { Snake, snakeSide } from "./snake";
 
 // A pixel pet that runs after the cursor and settles down when it catches up.
 //
 //   cat    sprite sheet /public/pet/frames.png (256x128, 32px cells)
+//   frog   sprite sheet /public/pet/frog.png (256x96, 8x3 grid of 32px cells)
 //   snake  drawn live by ./snake.ts, so it can be any length
 //
 //   scope="page"  fixed to the viewport, follows the cursor anywhere
@@ -14,7 +15,6 @@ import { Snake, snakeSide } from "./snake";
 //                 overflow: hidden) and follows the cursor over that parent.
 //                 Used for the preview in the dashboard.
 
-const SHEET_URL = "/pet/frames.png";
 const CELL = 32; // the cat's canvas is one 32x32 cell; the sprite is centred in it
 const BASE_SPEED = 225; // px per second at speed 100%
 const STRIDE_PX = 15; // ground covered per leg swap at 100% size, so legs match the speed
@@ -26,20 +26,49 @@ const BREATHE_MS = 200; // breathing loop, one frame every 200ms
 type Frame = { x: number; y: number; w: number; h: number };
 const frame = (x: number, y: number, w = 32, h = 32): Frame => ({ x, y, w, h });
 
-// Clockwise from "right", so index = round(angle / 45deg)
-const RUN: Frame[][] = [
-  [frame(95, 0, 32, 28), frame(96, 33, 32, 28)], // right
-  [frame(160, 33), frame(162, 62)], // down-right
-  [frame(193, 96), frame(224, 63)], // down
-  [frame(160, 96), frame(128, 96)], // down-left
-  [frame(129, 64, 32, 28), frame(128, 99, 32, 28)], // left
-  [frame(34, 0), frame(33, 30)], // up-left
-  [frame(32, 64), frame(32, 96)], // up
-  [frame(0, 64), frame(0, 96)], // up-right
-];
-const STILL = frame(96, 96);
-const SIT = frame(96, 63);
-const BREATHE = [frame(64, 0), frame(64, 32)];
+type Sprites = {
+  url: string;
+  /** 8 directions, clockwise from "right" so index = round(angle / 45deg), 2 leg frames each */
+  run: Frame[][];
+  still: Frame;
+  sit: Frame;
+  breathe: Frame[];
+  /** Multiplier on STRIDE_PX. Hoppers cover more ground per frame swap. */
+  stride: number;
+};
+
+const CAT: Sprites = {
+  url: "/pet/frames.png",
+  run: [
+    [frame(95, 0, 32, 28), frame(96, 33, 32, 28)], // right
+    [frame(160, 33), frame(162, 62)], // down-right
+    [frame(193, 96), frame(224, 63)], // down
+    [frame(160, 96), frame(128, 96)], // down-left
+    [frame(129, 64, 32, 28), frame(128, 99, 32, 28)], // left
+    [frame(34, 0), frame(33, 30)], // up-left
+    [frame(32, 64), frame(32, 96)], // up
+    [frame(0, 64), frame(0, 96)], // up-right
+  ],
+  still: frame(96, 96),
+  sit: frame(96, 63),
+  breathe: [frame(64, 0), frame(64, 32)],
+  stride: 1,
+};
+
+// The frog sheet is a clean grid:
+//   rows 0 and 1  crouch and leap frames for each of the 8 directions
+//   row 2         still, sit, breathe 0, breathe 1
+const cell = (col: number, row: number) => frame(col * 32, row * 32);
+const FROG: Sprites = {
+  url: "/pet/frog.png",
+  run: Array.from({ length: 8 }, (_, d) => [cell(d, 0), cell(d, 1)]),
+  still: cell(0, 2),
+  sit: cell(1, 2),
+  breathe: [cell(2, 2), cell(3, 2)],
+  stride: 1.5,
+};
+
+const SPRITES: Record<Exclude<PetType, "snake">, Sprites> = { cat: CAT, frog: FROG };
 
 /** Recolours the white part of the sprite. The black outline is kept. */
 function tint(img: HTMLImageElement, color: string): HTMLCanvasElement {
@@ -124,11 +153,19 @@ export default function CursorPet({
     source.addEventListener("pointermove", onMove as EventListener);
     if (host) host.addEventListener("pointerleave", onLeave);
 
-    // The cat's sprite sheet, loaded once; `sheet` is the tinted copy we draw from
+    // Sprite sheets load the first time a pet needs them; `sheet` is the tinted
+    // copy of the current pet's sheet that we draw from
+    const images: Record<string, HTMLImageElement> = {};
+    const imageFor = (url: string) => {
+      if (!images[url]) {
+        const img = new Image();
+        img.src = url;
+        images[url] = img;
+      }
+      return images[url];
+    };
     let sheet: HTMLCanvasElement | null = null;
-    let builtColor = "";
-    const catImg = new Image();
-    catImg.src = SHEET_URL;
+    let builtKey = "";
 
     const snake = new Snake();
 
@@ -221,33 +258,37 @@ export default function CursorPet({
         return;
       }
 
-      // ---- Cat: pick a frame from the sprite sheet ----
+      // ---- Sprite pets: pick a frame from the sprite sheet ----
       setSide(CELL);
+      const sp = SPRITES[s.type === "snake" ? "cat" : s.type];
 
-      // (Re)build the tinted sheet when the colour changes
-      if (catImg.complete && catImg.naturalWidth > 0 && builtColor !== s.color) {
-        sheet = tint(catImg, s.color);
-        builtColor = s.color;
+      // (Re)build the tinted sheet when the colour or the pet changes. Until the
+      // new sheet is ready we draw nothing rather than the old pet's frames.
+      const sheetKey = `${s.type}|${s.color}`;
+      const img = imageFor(sp.url);
+      if (img.complete && img.naturalWidth > 0 && builtKey !== sheetKey) {
+        sheet = tint(img, s.color);
+        builtKey = sheetKey;
         lastKey = "";
       }
-      if (!sheet) return;
+      if (!sheet || builtKey !== sheetKey) return;
 
       let f: Frame;
       let key: string;
       if (running) {
-        // Swap legs once per stride, so a slow cat has slow legs
-        if (travel >= STRIDE_PX * (s.size / 100) && ts - lastRunSwap >= MIN_RUN_FRAME_MS) {
+        // Swap legs once per stride, so a slow pet has slow legs
+        if (travel >= STRIDE_PX * sp.stride * (s.size / 100) && ts - lastRunSwap >= MIN_RUN_FRAME_MS) {
           runFrame ^= 1;
           lastRunSwap = ts;
           travel = 0;
         }
-        f = RUN[dir][runFrame];
+        f = sp.run[dir][runFrame];
         key = `r${dir}${runFrame}`;
       } else {
         const t = ts - idleSince;
-        if (t < STILL_MS) f = STILL;
-        else if (t < STILL_MS + SIT_MS) f = SIT;
-        else f = BREATHE[Math.floor((t - STILL_MS - SIT_MS) / BREATHE_MS) % 2];
+        if (t < STILL_MS) f = sp.still;
+        else if (t < STILL_MS + SIT_MS) f = sp.sit;
+        else f = sp.breathe[Math.floor((t - STILL_MS - SIT_MS) / BREATHE_MS) % 2];
         key = `i${f.x},${f.y}`;
       }
 

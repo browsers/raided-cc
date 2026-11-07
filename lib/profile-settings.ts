@@ -180,9 +180,10 @@ export function tooltipVars(t: TooltipSettings): Record<string, string> {
 
 // ---------- Cursor pet (the little sprite that chases the visitor's mouse) ----------
 
-/** Which pet. The cat is a sprite sheet (public/pet/frames.png); the snake is
- *  drawn live in components/snake.ts so it can be any length. */
-export const PET_TYPES = ["cat", "snake"] as const;
+/** Which pet. Cat and frog are sprite sheets in public/pet/; the snake is
+ *  drawn live in components/snake.ts so it can be any length. The order here
+ *  is the order of the dropdown. */
+export const PET_TYPES = ["cat", "frog", "snake"] as const;
 export type PetType = (typeof PET_TYPES)[number];
 
 export type PetSettings = {
