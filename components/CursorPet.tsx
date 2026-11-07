@@ -83,11 +83,12 @@ export default function CursorPet({
     const host = scope === "box" ? canvas.parentElement : null;
     if (scope === "box" && !host) return;
 
-    // Touch screens have no cursor to chase
-    if (scope === "page" && window.matchMedia("(hover: none)").matches) {
-      canvas.style.display = "none";
-      return;
-    }
+    // Touch screens have no cursor to chase. A media query like (hover: none) is
+    // unreliable (touch laptops, tablet mode and devtools emulation report it even
+    // with a mouse attached), so on the page the pet stays hidden until a real
+    // mouse or pen actually moves. Touch never reveals it.
+    let shown = scope === "box";
+    if (!shown) canvas.style.display = "none";
 
     const size = () => ({
       w: host ? host.clientWidth : window.innerWidth,
@@ -100,6 +101,11 @@ export default function CursorPet({
     let hovering = false; // box scope: is the pointer over the box right now?
 
     const onMove = (e: PointerEvent) => {
+      if (!shown) {
+        if (e.pointerType === "touch") return;
+        shown = true;
+        canvas.style.display = "";
+      }
       hovering = true;
       if (host) {
         const r = host.getBoundingClientRect();
@@ -163,6 +169,7 @@ export default function CursorPet({
 
     const tick = (ts: number) => {
       raf = requestAnimationFrame(tick);
+      if (!shown) return; // nothing to draw until a mouse shows up
       const dt = last ? Math.min(0.05, (ts - last) / 1000) : 0;
       last = ts;
       const s = settingsRef.current;
