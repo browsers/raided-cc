@@ -115,14 +115,14 @@
     transform: translateX(50%);
   }
 }
-/* Layout: stacked. Picture above the name, everything centered.
-   Same arrangement the card already uses on small screens, at every width. */
+/* Layout: stacked. Picture above the name, everything centered,
+   view counter tucked in the bottom right corner. */
 .profile__card[data-layout="stacked"] {
   flex-direction: column;
   align-items: center;
   gap: 20px;
   max-width: 480px;
-  padding: 28px 20px 56px;
+  padding: 28px 20px 44px;
 }
 
 .profile__card[data-layout="stacked"] .profile__name {
@@ -131,8 +131,8 @@
 }
 
 .profile__card[data-layout="stacked"] .profile__views {
-  right: 50%;
-  transform: translateX(50%);
+  right: 22px;
+  transform: none; /* beats the centered small-screen rule */
 }
 
 /* Background video/image behind everything */
