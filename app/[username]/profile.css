@@ -115,6 +115,26 @@
     transform: translateX(50%);
   }
 }
+/* Layout: stacked. Picture above the name, everything centered.
+   Same arrangement the card already uses on small screens, at every width. */
+.profile__card[data-layout="stacked"] {
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-width: 480px;
+  padding: 28px 20px 56px;
+}
+
+.profile__card[data-layout="stacked"] .profile__name {
+  margin-top: 0;
+  text-align: center;
+}
+
+.profile__card[data-layout="stacked"] .profile__views {
+  right: 50%;
+  transform: translateX(50%);
+}
+
 /* Background video/image behind everything */
 .profile__bg {
   position: fixed;

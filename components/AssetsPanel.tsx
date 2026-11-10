@@ -3,7 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { authClient } from "../lib/auth-client";
 import type { Background } from "../lib/r2";
-import type { AvatarSettings, TooltipSettings } from "../lib/profile-settings";
+import {
+  PROFILE_LAYOUTS,
+  type AvatarSettings,
+  type ProfileLayout,
+  type TooltipSettings,
+} from "../lib/profile-settings";
 import CardCustomizer from "./CardCustomizer";
 
 type BoxId = "pfp" | "background" | "music";
@@ -25,6 +30,8 @@ export default function AssetsPanel({
   onAvatarLayout,
   tooltip,
   onTooltip,
+  layout,
+  onLayout,
 }: {
   image: string | null;
   onAvatar: (url: string) => void;
@@ -36,6 +43,8 @@ export default function AssetsPanel({
   onAvatarLayout: (next: AvatarSettings) => void;
   tooltip: TooltipSettings;
   onTooltip: (next: TooltipSettings) => void;
+  layout: ProfileLayout;
+  onLayout: (next: ProfileLayout) => void;
 }) {
   const [over, setOver] = useState<BoxId | null>(null);
   const [busy, setBusy] = useState<BoxId | null>(null);
@@ -45,6 +54,8 @@ export default function AssetsPanel({
   // Card settings: the screen updates instantly, and everything changed is saved
   // in one request a moment after you stop touching the controls.
   const [cardStatus, setCardStatus] = useState<"" | "saving" | "saved" | "error">("");
+  // Which box (Card or Layout) shows the "Saving..." / "Saved." line: the one touched last
+  const [statusGroup, setStatusGroup] = useState<"card" | "layout">("card");
   const pending = useRef<Record<string, unknown>>({});
   const saveTimer = useRef<number | undefined>(undefined);
 
@@ -64,7 +75,8 @@ export default function AssetsPanel({
     }
   };
 
-  const saveCard = (patch: Record<string, unknown>) => {
+  const saveCard = (patch: Record<string, unknown>, group: "card" | "layout" = "card") => {
+    setStatusGroup(group);
     pending.current = { ...pending.current, ...patch };
     setCardStatus("saving");
     window.clearTimeout(saveTimer.current);
@@ -85,6 +97,19 @@ export default function AssetsPanel({
       }
     },
     [],
+  );
+
+  const changeLayout = (next: ProfileLayout) => {
+    onLayout(next);
+    saveCard({ layout: next }, "layout");
+  };
+
+  const statusText =
+    cardStatus === "saving" ? "Saving..." : cardStatus === "saved" ? "Saved." : cardStatus === "error" ? "Couldn't save. Try again." : "";
+  const status = (group: "card" | "layout") => (
+    <p className="setting__status" data-error={statusGroup === group && cardStatus === "error"}>
+      {statusGroup === group ? statusText : ""}
+    </p>
   );
 
   const changeOpacity = (raw: number) => {
@@ -282,16 +307,35 @@ export default function AssetsPanel({
           }}
         />
 
-        <p className="setting__status" data-error={cardStatus === "error"}>
-          {cardStatus === "saving" && "Saving..."}
-          {cardStatus === "saved" && "Saved."}
-          {cardStatus === "error" && "Couldn't save. Try again."}
-        </p>
+        {status("card")}
       </div>
 
       {/* Layout settings */}
       <div className="assets__group assets__group--fill">
         <h2 className="assets__title">Layout</h2>
+
+        <div className="setting">
+          <div className="setting__text">
+            <span className="setting__name">Profile layout</span>
+            <span className="setting__desc">How your picture and name are arranged on your profile.</span>
+          </div>
+          <div className="setting__controls">
+            <select
+              className="select select--inline"
+              value={layout}
+              onChange={(e) => changeLayout(e.target.value as ProfileLayout)}
+              aria-label="Profile layout"
+            >
+              {PROFILE_LAYOUTS.map((l) => (
+                <option key={l.value} value={l.value}>
+                  {l.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {status("layout")}
       </div>
     </div>
   );

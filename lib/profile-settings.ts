@@ -107,6 +107,21 @@ export function avatarBorderVars(a: AvatarSettings): Record<string, string> {
   return vars;
 }
 
+// ---------- Profile layout (how the picture and name are arranged on the card) ----------
+
+export const PROFILE_LAYOUTS = [
+  { value: "default", label: "Default (picture beside name)" },
+  { value: "stacked", label: "Stacked (picture above name)" },
+] as const;
+export type ProfileLayout = (typeof PROFILE_LAYOUTS)[number]["value"];
+
+export const DEFAULT_LAYOUT: ProfileLayout = "default";
+
+export const sanitizeLayout = (v: unknown): ProfileLayout =>
+  pick(v, PROFILE_LAYOUTS.map((l) => l.value), DEFAULT_LAYOUT);
+
+export const layoutFrom = (settings: Record<string, unknown>) => sanitizeLayout(settings.layout);
+
 // ---------- Tooltips (the hover bubbles on the name and view count) ----------
 
 export const TIP_SHAPES = [

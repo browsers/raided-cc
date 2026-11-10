@@ -5,7 +5,7 @@ import { authClient } from "../lib/auth-client";
 import AssetsPanel from "./AssetsPanel";
 import MiscPanel from "./MiscPanel";
 import type { Background } from "../lib/r2";
-import type { AvatarSettings, PetSettings, TooltipSettings } from "../lib/profile-settings";
+import type { AvatarSettings, PetSettings, ProfileLayout, TooltipSettings } from "../lib/profile-settings";
 import DashboardNav, { type Section } from "./DashboardNav";
 
 export default function DashboardShell({
@@ -18,6 +18,7 @@ export default function DashboardShell({
   avatarLayout: initialAvatarLayout,
   tooltip: initialTooltip,
   pet: initialPet,
+  layout: initialLayout,
 }: {
   username: string;
   displayName: string;
@@ -28,6 +29,7 @@ export default function DashboardShell({
   avatarLayout: AvatarSettings;
   tooltip: TooltipSettings;
   pet: PetSettings;
+  layout: ProfileLayout;
 }) {
   const [section, setSection] = useState<Section>("overview");
   const [image, setImage] = useState<string | null>(initialImage);
@@ -36,6 +38,7 @@ export default function DashboardShell({
   const [avatarLayout, setAvatarLayout] = useState(initialAvatarLayout);
   const [tooltip, setTooltip] = useState(initialTooltip);
   const [pet, setPet] = useState(initialPet);
+  const [layout, setLayout] = useState(initialLayout);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -199,6 +202,8 @@ export default function DashboardShell({
             onAvatarLayout={setAvatarLayout}
             tooltip={tooltip}
             onTooltip={setTooltip}
+            layout={layout}
+            onLayout={setLayout}
           />
         )}
         {section === "description" && null}

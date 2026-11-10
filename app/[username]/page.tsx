@@ -8,6 +8,7 @@ import {
   avatarBorderVars,
   avatarRadius,
   cardOpacityFrom,
+  layoutFrom,
   parseSettings,
   petFrom,
   tooltipFrom,
@@ -81,6 +82,7 @@ async function getLook(userId: string) {
       avatar: avatarFrom(settings),
       tooltip: tooltipFrom(settings),
       pet: petFrom(settings),
+      layout: layoutFrom(settings),
     };
   } catch {
     const settings = {};
@@ -90,6 +92,7 @@ async function getLook(userId: string) {
       avatar: avatarFrom(settings),
       tooltip: tooltipFrom(settings),
       pet: petFrom(settings),
+      layout: layoutFrom(settings),
     };
   }
 }
@@ -116,7 +119,7 @@ export default async function ProfilePage({
 
   const views = await countUniqueView(user.id);
   const uid = await getUid(user.id);
-  const { background, cardOpacity, avatar, tooltip, pet } = await getLook(user.id);
+  const { background, cardOpacity, avatar, tooltip, pet, layout } = await getLook(user.id);
   const name = user.displayUsername || user.username;
 
   return (
@@ -125,6 +128,7 @@ export default async function ProfilePage({
       <div className="profile__stack">
         <main
           className="profile__card"
+          data-layout={layout}
           data-tip-anim={tooltip.animation}
           style={
             {

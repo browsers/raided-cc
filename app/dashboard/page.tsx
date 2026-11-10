@@ -6,11 +6,13 @@ import { backgroundFromKey, type Background } from "../../lib/r2";
 import {
   avatarFrom,
   cardOpacityFrom,
+  layoutFrom,
   parseSettings,
   petFrom,
   tooltipFrom,
   type AvatarSettings,
   type PetSettings,
+  type ProfileLayout,
   type TooltipSettings,
 } from "../../lib/profile-settings";
 
@@ -45,6 +47,7 @@ export default async function DashboardPage() {
   let avatar: AvatarSettings = avatarFrom({});
   let tooltip: TooltipSettings = tooltipFrom({});
   let pet: PetSettings = petFrom({});
+  let layout: ProfileLayout = layoutFrom({});
   if (session?.user?.id) {
     try {
       const row = await getDB()
@@ -57,6 +60,7 @@ export default async function DashboardPage() {
       avatar = avatarFrom(settings);
       tooltip = tooltipFrom(settings);
       pet = petFrom(settings);
+      layout = layoutFrom(settings);
     } catch {}
   }
 
@@ -71,6 +75,7 @@ export default async function DashboardPage() {
       avatarLayout={avatar}
       tooltip={tooltip}
       pet={pet}
+      layout={layout}
     />
   );
 }

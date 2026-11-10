@@ -601,6 +601,12 @@
   gap: 14px;
 }
 
+/* Dropdown that sits on the right of a .setting row */
+.select--inline {
+  width: 240px;
+  max-width: 100%;
+}
+
 .setting__status {
   min-height: 18px;
   margin: 10px 4px 0;
@@ -709,6 +715,9 @@
   }
   .setting__controls {
     justify-content: space-between;
+  }
+  .select--inline {
+    width: 100%;
   }
   .slider {
     flex: 1;
