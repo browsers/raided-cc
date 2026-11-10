@@ -232,7 +232,7 @@ export default function AssetsPanel({
       </div>
 
       {/* Card settings */}
-      <div className="assets__group assets__group--fill">
+      <div className="assets__group">
         <h2 className="assets__title">Card</h2>
 
         <div className="setting">
@@ -287,6 +287,11 @@ export default function AssetsPanel({
           {cardStatus === "saved" && "Saved."}
           {cardStatus === "error" && "Couldn't save. Try again."}
         </p>
+      </div>
+
+      {/* Layout settings */}
+      <div className="assets__group assets__group--fill">
+        <h2 className="assets__title">Layout</h2>
       </div>
     </div>
   );
